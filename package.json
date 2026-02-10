@@ -1,0 +1,45 @@
+{
+  "name": "portfolio-backend",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev --turbopack -p 3001",
+    "build": "next build --turbopack",
+    "start": "next start",
+    "lint": "eslint",
+    "db:setup": "node scripts/setup-database.js",
+    "db:clean": "node scripts/clean-database.js",
+    "db:test-otp": "node scripts/test-otp-system.js",
+    "test:send-otp": "node scripts/test-send-otp-email.js",
+    "create:admin": "node scripts/create-admin.js",
+    "create:teacher": "node scripts/create-teacher.js",
+    "create:admin-company": "node scripts/create-admin-and-company.js"
+    
+  },
+  "dependencies": {
+    "@getbrevo/brevo": "^3.0.1",
+    "bcryptjs": "^3.0.2",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.3",
+    "js-cookie": "^3.0.5",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.19.0",
+    "next": "15.5.4",
+    "nodemailer": "^7.0.12",
+    "react": "19.1.0",
+    "react-dom": "19.1.0"
+  },
+  "devDependencies": {
+    "@eslint/eslintrc": "^3",
+    "@tailwindcss/postcss": "^4",
+    "@types/bcryptjs": "^2.4.6",
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9",
+    "eslint-config-next": "15.5.4",
+    "tailwindcss": "^4",
+    "typescript": "^5"
+  }
+}
