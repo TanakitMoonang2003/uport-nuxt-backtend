@@ -14,7 +14,6 @@
     "create:admin": "node scripts/create-admin.js",
     "create:teacher": "node scripts/create-teacher.js",
     "create:admin-company": "node scripts/create-admin-and-company.js"
-    
   },
   "dependencies": {
     "@getbrevo/brevo": "^3.0.1",
@@ -24,7 +23,7 @@
     "js-cookie": "^3.0.5",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.19.0",
-    "next": "15.5.4",
+    "next": "15.5.9",
     "nodemailer": "^7.0.12",
     "react": "19.1.0",
     "react-dom": "19.1.0"
