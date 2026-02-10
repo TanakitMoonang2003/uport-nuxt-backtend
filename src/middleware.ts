@@ -3,6 +3,9 @@ import { NextRequest, NextResponse } from 'next/server';
 export function middleware(request: NextRequest) {
   const origin = request.headers.get('origin');
 
+  // Get allowed origins from environment or use defaults
+  const envOrigins = process.env.ALLOWED_ORIGINS?.split(',').map(o => o.trim()) || [];
+
   // Define allowed origins
   const allowedOrigins = [
     'http://localhost:3000',
@@ -12,7 +15,12 @@ export function middleware(request: NextRequest) {
     'http://localhost:3002',
     'http://127.0.0.1:3002',
     'http://localhost:3003',
-    'http://127.0.0.1:3003'
+    'http://127.0.0.1:3003',
+    // Vercel deployments
+    'https://uport-nuxt-frontend-git-main-tanakitmoonang2003s-projects.vercel.app',
+    'https://uport-nuxt-frontend-tanakitmoonang2003s-projects.vercel.app',
+    'https://uport-nuxt-frontend.vercel.app',
+    ...envOrigins
   ];
 
   // Check if origin is allowed
