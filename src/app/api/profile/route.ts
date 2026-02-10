@@ -1,6 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import User from '@/models/User';
+import jwt from 'jsonwebtoken';
+
+interface AuthTokenPayload extends jwt.JwtPayload {
+    userId: string;
+    email: string;
+    role: 'admin' | 'user' | 'company' | 'teacher';
+    username?: string;
+}
 
 // CORS headers
 const corsHeaders = {
@@ -25,8 +33,10 @@ export async function GET(request: NextRequest) {
 
         try {
             const token = authHeader.replace('Bearer ', '');
-            const jwt = require('jsonwebtoken');
-            const decoded = jwt.verify(token, process.env.JWT_SECRET || 'fallback-secret');
+            const decoded = jwt.verify(
+                token,
+                process.env.JWT_SECRET || 'fallback-secret'
+            ) as AuthTokenPayload;
 
             // Get user data (exclude password)
             const user = await User.findById(decoded.userId).select('-password');
@@ -44,7 +54,7 @@ export async function GET(request: NextRequest) {
                 data: user
             }, { headers: corsHeaders });
 
-        } catch (jwtError) {
+        } catch (jwtError: unknown) {
             console.error('JWT verification failed:', jwtError);
             return NextResponse.json(
                 { success: false, error: 'Invalid or expired token' },
@@ -76,8 +86,10 @@ export async function PUT(request: NextRequest) {
 
         try {
             const token = authHeader.replace('Bearer ', '');
-            const jwt = require('jsonwebtoken');
-            const decoded = jwt.verify(token, process.env.JWT_SECRET || 'fallback-secret');
+            const decoded = jwt.verify(
+                token,
+                process.env.JWT_SECRET || 'fallback-secret'
+            ) as AuthTokenPayload;
 
             const body = await request.json();
 
@@ -119,7 +131,7 @@ export async function PUT(request: NextRequest) {
             ];
 
             // Filter only allowed fields
-            const updates: any = {};
+            const updates: Record<string, unknown> = {};
             for (const key of allowedUpdates) {
                 if (body[key] !== undefined) {
                     updates[key] = body[key];
@@ -146,7 +158,7 @@ export async function PUT(request: NextRequest) {
                 data: user
             }, { headers: corsHeaders });
 
-        } catch (jwtError) {
+        } catch (jwtError: unknown) {
             console.error('JWT verification failed:', jwtError);
             return NextResponse.json(
                 { success: false, error: 'Invalid or expired token' },

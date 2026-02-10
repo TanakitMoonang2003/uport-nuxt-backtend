@@ -5,6 +5,13 @@ import Portfolio from '@/models/Portfolio';
 import User from '@/models/User';
 import jwt from 'jsonwebtoken';
 
+interface AuthTokenPayload extends jwt.JwtPayload {
+    userId: string;
+    email: string;
+    role: 'admin' | 'user' | 'company' | 'teacher';
+    username?: string;
+}
+
 // GET /api/comments?portfolioId=X - Get comments for a portfolio
 // ทำให้เป็น public (ไม่ต้องส่ง JWT ก็อ่านได้) แต่ใช้ JWT ถ้ามี เพื่อคำนวณ canDelete
 export async function GET(request: NextRequest) {
@@ -24,13 +31,16 @@ export async function GET(request: NextRequest) {
 
         // พยายามอ่าน user จาก JWT ถ้ามี (optional)
         const authHeader = request.headers.get('authorization');
-        let decoded: any | null = null;
+        let decoded: AuthTokenPayload | null = null;
 
         if (authHeader) {
             try {
                 const token = authHeader.replace('Bearer ', '');
-                decoded = jwt.verify(token, process.env.JWT_SECRET || 'fallback-secret') as any;
-            } catch (jwtError: any) {
+                decoded = jwt.verify(
+                    token,
+                    process.env.JWT_SECRET || 'fallback-secret'
+                ) as AuthTokenPayload;
+            } catch (jwtError: unknown) {
                 decoded = null;
             }
         }
@@ -87,14 +97,16 @@ export async function GET(request: NextRequest) {
             data: commentsWithPermissions
         });
 
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error('Error fetching comments:', error);
+        const message = error instanceof Error ? error.message : 'Unknown error';
+        const stack = error instanceof Error ? error.stack : undefined;
         return NextResponse.json(
             {
                 success: false,
                 error: 'Failed to fetch comments',
-                detailed: error.message,
-                stack: error.stack
+                detailed: message,
+                stack
             },
             { status: 500 }
         );
@@ -117,7 +129,10 @@ export async function POST(request: NextRequest) {
 
         try {
             const token = authHeader.replace('Bearer ', '');
-            const decoded = jwt.verify(token, process.env.JWT_SECRET || 'fallback-secret') as any;
+            const decoded = jwt.verify(
+                token,
+                process.env.JWT_SECRET || 'fallback-secret'
+            ) as AuthTokenPayload;
 
             const body = await request.json();
             const { portfolioId, content } = body;
@@ -165,7 +180,7 @@ export async function POST(request: NextRequest) {
                 portfolioId: parseInt(portfolioId),
                 authorEmail: decoded.email,
                 authorName: userDoc?.username || decoded.username || decoded.email.split('@')[0],
-                authorRole: (userDoc?.role as any) || decoded.role || 'user',
+                authorRole: userDoc?.role ?? decoded.role ?? 'user',
                 content: content.trim()
             });
 
@@ -183,21 +198,25 @@ export async function POST(request: NextRequest) {
                 }
             });
 
-        } catch (jwtError: any) {
+        } catch (jwtError: unknown) {
             console.error('JWT verification failed:', jwtError);
+            const message =
+                jwtError instanceof Error ? jwtError.message : 'Invalid or expired token';
             return NextResponse.json(
-                { success: false, error: 'Invalid or expired token', detailed: jwtError.message },
+                { success: false, error: 'Invalid or expired token', detailed: message },
                 { status: 401 }
             );
         }
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error('Error creating comment:', error);
+        const message = error instanceof Error ? error.message : 'Unknown error';
+        const stack = error instanceof Error ? error.stack : undefined;
         return NextResponse.json(
             {
                 success: false,
                 error: 'Failed to create comment',
-                detailed: error.message,
-                stack: error.stack
+                detailed: message,
+                stack
             },
             { status: 500 }
         );

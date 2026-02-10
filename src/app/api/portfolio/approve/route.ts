@@ -3,6 +3,13 @@ import connectDB from '@/lib/mongodb';
 import Portfolio from '@/models/Portfolio';
 import jwt from 'jsonwebtoken';
 
+interface AuthTokenPayload extends jwt.JwtPayload {
+  userId: string;
+  email: string;
+  role: 'admin' | 'user' | 'company' | 'teacher';
+  username?: string;
+}
+
 // Handle CORS preflight requests
 export async function OPTIONS(request: NextRequest) {
   return new Response(null, {
@@ -37,9 +44,12 @@ export async function POST(request: NextRequest) {
     }
     
     const token = authHeader.replace('Bearer ', '');
-    let decoded: any;
+    let decoded: AuthTokenPayload;
     try {
-      decoded = jwt.verify(token, process.env.JWT_SECRET || 'fallback-secret');
+      decoded = jwt.verify(
+        token,
+        process.env.JWT_SECRET || 'fallback-secret'
+      ) as AuthTokenPayload;
     } catch (error) {
       return NextResponse.json(
         { success: false, error: 'Invalid token' },
@@ -138,7 +148,7 @@ export async function POST(request: NextRequest) {
       }
     });
     
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Error approving/rejecting portfolio:', error);
     return NextResponse.json(
       { success: false, error: 'Failed to process approval' },

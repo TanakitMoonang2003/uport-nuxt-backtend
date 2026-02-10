@@ -4,6 +4,13 @@ import Comment from '@/models/Comment';
 import Portfolio from '@/models/Portfolio';
 import jwt from 'jsonwebtoken';
 
+interface AuthTokenPayload extends jwt.JwtPayload {
+    userId: string;
+    email: string;
+    role: 'admin' | 'user' | 'company' | 'teacher';
+    username?: string;
+}
+
 // DELETE /api/comments/[id] - Delete a comment
 export async function DELETE(
     request: NextRequest,
@@ -23,7 +30,10 @@ export async function DELETE(
 
         try {
             const token = authHeader.replace('Bearer ', '');
-            const decoded = jwt.verify(token, process.env.JWT_SECRET || 'fallback-secret') as any;
+            const decoded = jwt.verify(
+                token,
+                process.env.JWT_SECRET || 'fallback-secret'
+            ) as AuthTokenPayload;
 
             const commentId = parseInt(params.id);
 
@@ -68,21 +78,25 @@ export async function DELETE(
                 message: 'Comment deleted successfully'
             });
 
-        } catch (jwtError: any) {
+        } catch (jwtError: unknown) {
             console.error('JWT verification failed:', jwtError);
+            const message =
+                jwtError instanceof Error ? jwtError.message : 'Invalid or expired token';
             return NextResponse.json(
-                { success: false, error: 'Invalid or expired token', detailed: jwtError.message },
+                { success: false, error: 'Invalid or expired token', detailed: message },
                 { status: 401 }
             );
         }
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error('Error deleting comment:', error);
+        const message = error instanceof Error ? error.message : 'Unknown error';
+        const stack = error instanceof Error ? error.stack : undefined;
         return NextResponse.json(
             {
                 success: false,
                 error: 'Failed to delete comment',
-                detailed: error.message,
-                stack: error.stack
+                detailed: message,
+                stack
             },
             { status: 500 }
         );

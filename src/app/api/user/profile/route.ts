@@ -3,6 +3,13 @@ import connectDB from '@/lib/mongodb';
 import User from '@/models/User';
 import jwt from 'jsonwebtoken';
 
+interface AuthTokenPayload extends jwt.JwtPayload {
+  userId: string;
+  email: string;
+  role: 'admin' | 'user' | 'company' | 'teacher';
+  username?: string;
+}
+
 // GET /api/user/profile - Get user profile
 export async function GET(request: NextRequest) {
   try {
@@ -20,7 +27,10 @@ export async function GET(request: NextRequest) {
     const token = authHeader.substring(7);
     
     // Verify token
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'yourlsajdlasdna;skdh;oinklengoinnds') as any;
+    const decoded = jwt.verify(
+      token,
+      process.env.JWT_SECRET || 'yourlsajdlasdna;skdh;oinklengoinnds'
+    ) as AuthTokenPayload;
     
     // Find user by ID
     const user = await User.findById(decoded.userId).select('-password');
@@ -62,7 +72,10 @@ export async function PUT(request: NextRequest) {
     const token = authHeader.substring(7);
     
     // Verify token
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'yourlsajdlasdna;skdh;oinklengoinnds') as any;
+    const decoded = jwt.verify(
+      token,
+      process.env.JWT_SECRET || 'yourlsajdlasdna;skdh;oinklengoinnds'
+    ) as AuthTokenPayload;
     
     const body = await request.json();
     

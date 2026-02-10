@@ -3,6 +3,13 @@ import connectDB from '@/lib/mongodb';
 import User from '@/models/User';
 import jwt from 'jsonwebtoken';
 
+interface AuthTokenPayload extends jwt.JwtPayload {
+  userId: string;
+  email: string;
+  role: 'admin' | 'user' | 'company' | 'teacher';
+  username?: string;
+}
+
 // Handle CORS preflight requests
 export async function OPTIONS(request: NextRequest) {
   return new Response(null, {
@@ -23,9 +30,12 @@ async function verifyAdmin(request: NextRequest) {
   }
 
   const token = authHeader.substring(7);
-  let decoded: any;
+  let decoded: AuthTokenPayload;
   try {
-    decoded = jwt.verify(token, process.env.JWT_SECRET || 'fallback-secret');
+    decoded = jwt.verify(
+      token,
+      process.env.JWT_SECRET || 'fallback-secret'
+    ) as AuthTokenPayload;
   } catch (error) {
     return { error: 'Invalid or expired token', status: 401 };
   }
@@ -105,7 +115,7 @@ export async function PUT(
       }
     });
 
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Error updating user:', error);
     return NextResponse.json(
       { success: false, error: 'Failed to update user' },
@@ -198,7 +208,7 @@ export async function PATCH(
       }
     });
 
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Error updating user status:', error);
     return NextResponse.json(
       { success: false, error: 'Failed to update user status' },
@@ -299,7 +309,7 @@ export async function DELETE(
       }
     });
 
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Error deleting user:', error);
     return NextResponse.json(
       { success: false, error: 'Failed to delete user' },

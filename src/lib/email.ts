@@ -192,32 +192,50 @@ UPORT - รหัสยืนยันอีเมล
     
     const result = await api.sendTransacEmail(sendSmtpEmail);
     return true;
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('❌ Error sending email via Brevo:', error);
-    
-    // Extract more detailed error information
-    const errorDetails: any = {
-      message: error.message,
-      code: error.code,
-      status: error.status || error.response?.status || error.response?.statusCode,
+
+    type ErrorDetails = {
+      message?: unknown;
+      code?: unknown;
+      status?: unknown;
+      responseBody?: unknown;
     };
-    
+
+    const baseError = error as {
+      message?: unknown;
+      code?: unknown;
+      status?: unknown;
+      response?: { status?: unknown; statusCode?: unknown; body?: unknown; data?: unknown };
+    };
+
+    // Extract more detailed error information
+    const errorDetails: ErrorDetails = {
+      message: baseError.message,
+      code: baseError.code,
+      status:
+        baseError.status ??
+        baseError.response?.status ??
+        baseError.response?.statusCode,
+    };
+
     // Try to get response body
-    if (error.response) {
+    if (baseError.response) {
       try {
-        errorDetails.responseBody = error.response.body || error.response.data;
-      } catch (e) {
+        errorDetails.responseBody =
+          baseError.response.body ?? baseError.response.data;
+      } catch {
         // Ignore if can't parse
       }
     }
-    
+
     // Check if it's an authentication error
     if (errorDetails.status === 401 || errorDetails.status === 403) {
       console.error('🔐 Authentication Error - Please check your BREVO_API_KEY');
       console.error('   Make sure the API key starts with "xkeysib-" for REST API');
       console.error('   Current API key length:', process.env.BREVO_API_KEY?.length || 0);
     }
-    
+
     console.error('Error details:', errorDetails);
     throw error;
   }

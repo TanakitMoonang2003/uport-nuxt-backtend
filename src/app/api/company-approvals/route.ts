@@ -3,6 +3,13 @@ import connectDB from '@/lib/mongodb';
 import User from '@/models/User';
 import jwt from 'jsonwebtoken';
 
+interface AuthTokenPayload extends jwt.JwtPayload {
+  userId: string;
+  email: string;
+  role: 'admin' | 'user' | 'company' | 'teacher';
+  username?: string;
+}
+
 // Handle CORS preflight requests
 export async function OPTIONS(request: NextRequest) {
   return new Response(null, {
@@ -39,10 +46,13 @@ export async function GET(request: NextRequest) {
 
     const token = authHeader.substring(7);
     
-    let decoded;
+    let decoded: AuthTokenPayload;
     try {
-      decoded = jwt.verify(token, process.env.JWT_SECRET || 'fallback-secret') as any;
-    } catch (jwtError) {
+      decoded = jwt.verify(
+        token,
+        process.env.JWT_SECRET || 'fallback-secret'
+      ) as AuthTokenPayload;
+    } catch (jwtError: unknown) {
       console.error('❌ Company Approvals - JWT verification failed:', jwtError);
       return NextResponse.json(
         { success: false, error: 'Invalid or expired token' },
@@ -130,7 +140,10 @@ export async function POST(request: NextRequest) {
     }
 
     const token = authHeader.substring(7);
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'fallback-secret') as any;
+    const decoded = jwt.verify(
+      token,
+      process.env.JWT_SECRET || 'fallback-secret'
+    ) as AuthTokenPayload;
     
     // Check if user is admin or teacher
     const currentUser = await User.findById(decoded.userId);

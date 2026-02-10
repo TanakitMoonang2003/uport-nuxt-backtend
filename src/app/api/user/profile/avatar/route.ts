@@ -3,6 +3,13 @@ import connectDB from '@/lib/mongodb';
 import User from '@/models/User';
 import jwt from 'jsonwebtoken';
 
+interface AuthTokenPayload extends jwt.JwtPayload {
+  userId: string;
+  email: string;
+  role: 'admin' | 'user' | 'company' | 'teacher';
+  username?: string;
+}
+
 // POST /api/user/profile/avatar - Upload avatar
 export async function POST(request: NextRequest) {
   try {
@@ -20,7 +27,10 @@ export async function POST(request: NextRequest) {
     const token = authHeader.substring(7);
     
     // Verify token
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'yourlsajdlasdna;skdh;oinklengoinnds') as any;
+    const decoded = jwt.verify(
+      token,
+      process.env.JWT_SECRET || 'yourlsajdlasdna;skdh;oinklengoinnds'
+    ) as AuthTokenPayload;
     
     // Get form data
     const formData = await request.formData();

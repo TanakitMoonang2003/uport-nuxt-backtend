@@ -1,6 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import Portfolio from '@/models/Portfolio';
+import jwt from 'jsonwebtoken';
+
+interface AuthTokenPayload extends jwt.JwtPayload {
+  userId: string;
+  email: string;
+  role: 'admin' | 'user' | 'company' | 'teacher';
+  username?: string;
+}
 
 // Handle CORS preflight requests
 export async function OPTIONS(request: NextRequest) {
@@ -29,8 +37,10 @@ export async function GET(request: NextRequest) {
       const authHeader = request.headers.get('authorization');
       if (authHeader) {
         const token = authHeader.replace('Bearer ', '');
-        const jwt = require('jsonwebtoken');
-        const decoded = jwt.verify(token, process.env.JWT_SECRET || 'fallback-secret');
+        const decoded = jwt.verify(
+          token,
+          process.env.JWT_SECRET || 'fallback-secret'
+        ) as AuthTokenPayload;
         isAdminOrTeacher = decoded.role === 'admin' || decoded.role === 'teacher';
       }
     } catch (authError) {
@@ -38,7 +48,7 @@ export async function GET(request: NextRequest) {
       isAdminOrTeacher = false;
     }
 
-    let query: any = {};
+    const query: Record<string, unknown> = {};
 
     // Filter by category
     if (category && category !== 'all') {
@@ -156,17 +166,30 @@ export async function POST(request: NextRequest) {
         'Access-Control-Allow-Headers': 'Content-Type, Authorization',
       }
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('❌ Error creating portfolio:');
-    console.error('   Error name:', error.name);
-    console.error('   Error message:', error.message);
-    console.error('   Error stack:', error.stack);
+    if (error instanceof Error) {
+      console.error('   Error name:', error.name);
+      console.error('   Error message:', error.message);
+      console.error('   Error stack:', error.stack);
+    } else {
+      console.error('   Unknown error:', error);
+    }
 
     // Handle validation errors
-    if (error.name === 'ValidationError') {
-      const validationErrors: any = {};
-      Object.keys(error.errors || {}).forEach(key => {
-        validationErrors[key] = error.errors[key].message;
+    if (
+      typeof error === 'object' &&
+      error !== null &&
+      'name' in error &&
+      (error as { name?: unknown }).name === 'ValidationError'
+    ) {
+      const validationErrors: Record<string, string> = {};
+      const validationError = error as {
+        errors?: Record<string, { message: string }>;
+      };
+      const fieldErrors = validationError.errors ?? {};
+      Object.keys(fieldErrors).forEach(key => {
+        validationErrors[key] = fieldErrors[key].message;
       });
       console.error('   Validation errors:', validationErrors);
       return NextResponse.json(
@@ -187,8 +210,14 @@ export async function POST(request: NextRequest) {
     }
 
     // Handle duplicate key errors
-    if (error.code === 11000) {
-      console.error('   Duplicate key error:', error.keyPattern);
+    if (
+      typeof error === 'object' &&
+      error !== null &&
+      'code' in error &&
+      (error as { code?: unknown }).code === 11000
+    ) {
+      const duplicateError = error as { keyPattern?: unknown };
+      console.error('   Duplicate key error:', duplicateError.keyPattern);
       return NextResponse.json(
         {
           success: false,
@@ -207,11 +236,14 @@ export async function POST(request: NextRequest) {
 
     // Generic error
     return NextResponse.json(
-      {
-        success: false,
-        error: 'Failed to create portfolio',
-        details: process.env.NODE_ENV === 'development' ? error.message : undefined
-      },
+        {
+          success: false,
+          error: 'Failed to create portfolio',
+          details:
+            process.env.NODE_ENV === 'development' && error instanceof Error
+              ? error.message
+              : undefined
+        },
       {
         status: 500,
         headers: {

@@ -1,6 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import Portfolio from '@/models/Portfolio';
+import jwt from 'jsonwebtoken';
+
+interface AuthTokenPayload extends jwt.JwtPayload {
+  userId: string;
+  email: string;
+  role: 'admin' | 'user' | 'company' | 'teacher';
+  username?: string;
+}
 
 // GET /api/portfolio/[id] - Get portfolio item by ID
 export async function GET(
@@ -57,8 +65,10 @@ export async function PUT(
 
     try {
       const token = authHeader.replace('Bearer ', '');
-      const jwt = require('jsonwebtoken');
-      const decoded = jwt.verify(token, process.env.JWT_SECRET || 'fallback-secret');
+      const decoded = jwt.verify(
+        token,
+        process.env.JWT_SECRET || 'fallback-secret'
+      ) as AuthTokenPayload;
 
       // Get existing portfolio
       const existingPortfolio = await Portfolio.findOne({ id: parseInt(params.id) });
@@ -110,7 +120,7 @@ export async function PUT(
         }
       });
 
-    } catch (jwtError) {
+    } catch (jwtError: unknown) {
       console.error('JWT verification failed:', jwtError);
       return NextResponse.json(
         { success: false, error: 'Invalid or expired token' },

@@ -72,11 +72,21 @@ export async function POST(request: NextRequest) {
       
       await sendOTPEmail({ email, otp });
       console.log(`✅ OTP email sent successfully to ${email}`);
-    } catch (emailError: any) {
+    } catch (emailError: unknown) {
       console.error('❌ Failed to send OTP email:', emailError);
-      console.error('   Error message:', emailError.message);
-      console.error('   Error status:', emailError.status || emailError.response?.status);
-      console.error('   Error response:', emailError.response?.body || emailError.response?.data);
+
+      const emailErr = emailError as {
+        message?: unknown;
+        status?: unknown;
+        response?: { status?: unknown; body?: unknown; data?: unknown };
+      };
+
+      console.error('   Error message:', emailErr.message);
+      console.error('   Error status:', emailErr.status || emailErr.response?.status);
+      console.error(
+        '   Error response:',
+        emailErr.response?.body || emailErr.response?.data
+      );
       
       // Log OTP to console as fallback for debugging
       console.log('=== OTP FALLBACK (Email failed) ===');
@@ -90,10 +100,12 @@ export async function POST(request: NextRequest) {
         { 
           success: false, 
           error: 'Failed to send OTP email. Please check server logs for details.',
-          errorDetails: process.env.NODE_ENV === 'development' ? {
-            message: emailError.message,
-            status: emailError.status || emailError.response?.status
-          } : undefined
+          errorDetails: process.env.NODE_ENV === 'development'
+            ? {
+                message: emailErr.message,
+                status: emailErr.status || emailErr.response?.status
+              }
+            : undefined
         },
         { status: 500 }
       );
