@@ -1,4 +1,4 @@
-import mongoose from 'mongoose';
+import mongoose, { Mongoose } from 'mongoose';
 
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/portfolio';
 
@@ -6,12 +6,15 @@ if (!MONGODB_URI) {
   throw new Error('Please define the MONGODB_URI environment variable inside .env.local');
 }
 
-// Extend the global namespace to include mongoose
+// Extend the global namespace to include mongoose with proper types
+interface MongooseCache {
+  conn: Mongoose | null;
+  promise: Promise<Mongoose> | null;
+}
+
 declare global {
-  var mongoose: {
-    conn: any | null;
-    promise: Promise<any> | null;
-  } | undefined;
+  // eslint-disable-next-line no-var
+  var mongoose: MongooseCache | undefined;
 }
 
 /**
