@@ -62,9 +62,9 @@ export async function GET(request: NextRequest) {
         const authorEmails = Array.from(new Set(allComments.map(c => c.authorEmail)));
         const users = await User.find({ email: { $in: authorEmails } }).select('email username');
         const userMap = new Map<string, string>();
-        users.forEach(u => {
-            // @ts-ignore - mongoose doc has email, username
-            userMap.set(u.email, u.username);
+        users.forEach((u) => {
+            const userDoc = u as { email: string; username: string };
+            userMap.set(userDoc.email, userDoc.username);
         });
 
         // ใส่ canDelete และใช้ username ล่าสุด จาก User ถ้ามี

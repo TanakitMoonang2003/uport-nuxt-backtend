@@ -190,7 +190,7 @@ UPORT - รหัสยืนยันอีเมล
     
     sendSmtpEmail.to = [{ email }];
     
-    const result = await api.sendTransacEmail(sendSmtpEmail);
+    await api.sendTransacEmail(sendSmtpEmail);
     return true;
   } catch (error: unknown) {
     console.error('❌ Error sending email via Brevo:', error);
