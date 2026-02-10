@@ -8,6 +8,13 @@ export interface IOTP extends Document {
   isUsed: boolean;
   createdAt: Date;
   updatedAt: Date;
+  markAsUsed(): Promise<this>;
+  incrementAttempts(): Promise<this>;
+}
+
+interface IOTPModel extends mongoose.Model<IOTP> {
+  cleanExpired(): Promise<unknown>;
+  findValidOTP(email: string, otp: string): Promise<IOTP | null>;
 }
 
 const OTPSchema = new Schema<IOTP>({
@@ -46,12 +53,12 @@ OTPSchema.index({ email: 1, isUsed: 1 });
 OTPSchema.index({ expires: 1 }, { expireAfterSeconds: 0 });
 
 // Static method to clean expired OTPs
-OTPSchema.statics.cleanExpired = async function() {
+OTPSchema.statics.cleanExpired = async function () {
   return this.deleteMany({ expires: { $lt: new Date() } });
 };
 
 // Static method to find valid OTP
-OTPSchema.statics.findValidOTP = async function(email: string, otp: string) {
+OTPSchema.statics.findValidOTP = async function (email: string, otp: string) {
   return this.findOne({
     email,
     otp,
@@ -61,16 +68,16 @@ OTPSchema.statics.findValidOTP = async function(email: string, otp: string) {
 };
 
 // Instance method to mark as used
-OTPSchema.methods.markAsUsed = function() {
+OTPSchema.methods.markAsUsed = function () {
   this.isUsed = true;
   return this.save();
 };
 
 // Instance method to increment attempts
-OTPSchema.methods.incrementAttempts = function() {
+OTPSchema.methods.incrementAttempts = function () {
   this.attempts += 1;
   return this.save();
 };
 
-export default mongoose.models.OTP || mongoose.model<IOTP>('OTP', OTPSchema);
+export default (mongoose.models.OTP as IOTPModel) || mongoose.model<IOTP, IOTPModel>('OTP', OTPSchema);
 

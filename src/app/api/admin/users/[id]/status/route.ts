@@ -25,17 +25,17 @@ export async function OPTIONS(_request: NextRequest) {
 // POST /api/admin/users/[id]/status - Toggle user status
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
     await connectDB();
-    
+
     // Check authentication
     const authHeader = request.headers.get('authorization');
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
       return NextResponse.json(
         { success: false, error: 'Authorization token required' },
-        { 
+        {
           status: 401,
           headers: {
             'Access-Control-Allow-Origin': '*',
@@ -56,7 +56,7 @@ export async function POST(
     } catch (error) {
       return NextResponse.json(
         { success: false, error: 'Invalid or expired token' },
-        { 
+        {
           status: 401,
           headers: {
             'Access-Control-Allow-Origin': '*',
@@ -66,13 +66,13 @@ export async function POST(
         }
       );
     }
-    
+
     // Check if user is admin
     const currentUser = await User.findById(decoded.userId);
     if (!currentUser || currentUser.role !== 'admin') {
       return NextResponse.json(
         { success: false, error: 'Only Admin can perform this action' },
-        { 
+        {
           status: 403,
           headers: {
             'Access-Control-Allow-Origin': '*',
@@ -83,14 +83,14 @@ export async function POST(
       );
     }
 
-    const userId = params.id;
+    const { id: userId } = await context.params;
 
     // Find user
     const user = await User.findById(userId);
     if (!user) {
       return NextResponse.json(
         { success: false, error: 'User not found' },
-        { 
+        {
           status: 404,
           headers: {
             'Access-Control-Allow-Origin': '*',
@@ -105,7 +105,7 @@ export async function POST(
     if (currentUser._id.toString() === userId && user.isActive) {
       return NextResponse.json(
         { success: false, error: 'You cannot deactivate yourself' },
-        { 
+        {
           status: 400,
           headers: {
             'Access-Control-Allow-Origin': '*',
@@ -140,7 +140,7 @@ export async function POST(
     console.error('Error toggling user status:', error);
     return NextResponse.json(
       { success: false, error: 'Failed to toggle user status' },
-      { 
+      {
         status: 500,
         headers: {
           'Access-Control-Allow-Origin': '*',

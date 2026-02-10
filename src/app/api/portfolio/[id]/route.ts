@@ -13,12 +13,13 @@ interface AuthTokenPayload extends jwt.JwtPayload {
 // GET /api/portfolio/[id] - Get portfolio item by ID
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
     await connectDB();
+    const { id } = await context.params;
 
-    const portfolio = await Portfolio.findOne({ id: parseInt(params.id) });
+    const portfolio = await Portfolio.findOne({ id: parseInt(id) });
 
     if (!portfolio) {
       return NextResponse.json(
@@ -43,10 +44,11 @@ export async function GET(
 // PUT /api/portfolio/[id] - Update portfolio item
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
     await connectDB();
+    const { id } = await context.params;
 
     // Get user from JWT token
     const authHeader = request.headers.get('authorization');
@@ -71,7 +73,7 @@ export async function PUT(
       ) as AuthTokenPayload;
 
       // Get existing portfolio
-      const existingPortfolio = await Portfolio.findOne({ id: parseInt(params.id) });
+      const existingPortfolio = await Portfolio.findOne({ id: parseInt(id) });
 
       if (!existingPortfolio) {
         return NextResponse.json(
@@ -104,7 +106,7 @@ export async function PUT(
 
       // Update portfolio
       const portfolio = await Portfolio.findOneAndUpdate(
-        { id: parseInt(params.id) },
+        { id: parseInt(id) },
         body,
         { new: true, runValidators: true }
       );
@@ -151,12 +153,13 @@ export async function PUT(
 // DELETE /api/portfolio/[id] - Delete portfolio item
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
     await connectDB();
+    const { id } = await context.params;
 
-    const portfolio = await Portfolio.findOneAndDelete({ id: parseInt(params.id) });
+    const portfolio = await Portfolio.findOneAndDelete({ id: parseInt(id) });
 
     if (!portfolio) {
       return NextResponse.json(

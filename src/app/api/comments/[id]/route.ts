@@ -14,7 +14,7 @@ interface AuthTokenPayload extends jwt.JwtPayload {
 // DELETE /api/comments/[id] - Delete a comment
 export async function DELETE(
     request: NextRequest,
-    { params }: { params: { id: string } }
+    context: { params: Promise<{ id: string }> }
 ) {
     try {
         await connectDB();
@@ -35,7 +35,8 @@ export async function DELETE(
                 process.env.JWT_SECRET || 'fallback-secret'
             ) as AuthTokenPayload;
 
-            const commentId = parseInt(params.id);
+            const { id } = await context.params;
+            const commentId = parseInt(id);
 
             // Get the comment
             const comment = await Comment.findOne({ id: commentId });
