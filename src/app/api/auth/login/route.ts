@@ -13,91 +13,87 @@ export async function OPTIONS(request: NextRequest) {
 // POST /api/auth/login - Login user
 export async function POST(request: NextRequest) {
   try {
-    const origin = request.headers.get('origin') || undefined;
     await connectDB();
-    
+
     const body = await request.json();
     let { email, password } = body;
 
     // Normalize email: trim whitespace and convert to lowercase
-    // This matches the User schema which stores emails in lowercase
     email = email ? email.trim().toLowerCase() : email;
     password = password ? password.trim() : password;
 
     // Validation
     if (!email || !password) {
-      const response = NextResponse.json(
+      return NextResponse.json(
         { success: false, error: 'Email and password are required' },
         { status: 400 }
       );
-      return addCorsHeaders(response, origin);
     }
 
     // Find user by email (include password field)
+    console.log(`Login attempt for email: "${email}" (length: ${email.length})`);
     const user = await User.findOne({ email }).select('+password');
-    
+
     if (!user) {
-      const response = NextResponse.json(
-        { success: false, error: 'Email or Password something Wrong.' },
+      console.log(`Login attempt failed: User not found for email ${email}`);
+      return NextResponse.json(
+        { success: false, error: 'Invalid email or password (ERR_USER_NOT_FOUND)' },
         { status: 401 }
       );
-      return addCorsHeaders(response, origin);
     }
 
     // Check if user is active
     if (!user.isActive) {
-      const response = NextResponse.json(
-        { success: false, error: 'Email or Password something Wrong.' },
+      console.log(`Login attempt failed: User ${email} is inactive`);
+      return NextResponse.json(
+        { success: false, error: 'Account is disabled. (ERR_USER_INACTIVE)' },
         { status: 401 }
       );
-      return addCorsHeaders(response, origin);
     }
 
     // Check if company is approved (for company users)
     if (user.role === 'company' && !user.isCompanyApproved) {
-      const response = NextResponse.json(
+      return NextResponse.json(
         { success: false, error: 'Wait for the teacher or administrator to click Agree.' },
         { status: 403 }
       );
-      return addCorsHeaders(response, origin);
     }
 
     // Check if teacher is confirmed (for teacher users only, not admin)
     if (user.role === 'teacher' && !user.isTeacherConfirmed) {
-      const response = NextResponse.json(
+      return NextResponse.json(
         { success: false, error: 'Wait for the teacher or administrator to click Agree.' },
         { status: 403 }
       );
-      return addCorsHeaders(response, origin);
     }
 
     // Verify password
     if (!user.password) {
-      console.error('❌ Password field is missing from user object!');
-      const response = NextResponse.json(
-        { success: false, error: 'Email or Password something Wrong.' },
+      console.error('❌ Password field is missing from user object in DB!');
+      return NextResponse.json(
+        { success: false, error: 'Authentication error occurred (ERR_PWD_MISSING)' },
         { status: 401 }
       );
-      return addCorsHeaders(response, origin);
     }
-    
+
+    console.log(`Verifying password for ${email} (password length: ${password.length})`);
     const isPasswordValid = await user.comparePassword(password);
-    
+
     if (!isPasswordValid) {
-      const response = NextResponse.json(
-        { success: false, error: 'Email or Password something Wrong.' },
+      console.log(`Login attempt failed: Incorrect password for user ${email}`);
+      return NextResponse.json(
+        { success: false, error: 'Invalid email or password (ERR_PWD_INVALID)' },
         { status: 401 }
       );
-      return addCorsHeaders(response, origin);
     }
-    
+
     // Generate JWT token
     const token = jwt.sign(
-      { 
-        userId: user._id, 
-        email: user.email, 
+      {
+        userId: user._id,
+        email: user.email,
         username: user.username,
-        role: user.role 
+        role: user.role
       },
       process.env.JWT_SECRET || 'fallback-secret',
       { expiresIn: '7d' }
@@ -114,7 +110,7 @@ export async function POST(request: NextRequest) {
       token
     };
 
-    const response = NextResponse.json(
+    return NextResponse.json(
       {
         success: true,
         message: 'Login successful',
@@ -124,15 +120,12 @@ export async function POST(request: NextRequest) {
         status: 200,
       }
     );
-    return addCorsHeaders(response, origin);
 
   } catch (error) {
     console.error('Login error:', error);
-    const origin = request.headers.get('origin') || undefined;
-    const response = NextResponse.json(
-      { success: false, error: 'Login failed' },
+    return NextResponse.json(
+      { success: false, error: 'Login failed due to server error' },
       { status: 500 }
     );
-    return addCorsHeaders(response, origin);
   }
 }
