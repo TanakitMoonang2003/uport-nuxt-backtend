@@ -28,13 +28,8 @@ export async function POST(request: NextRequest) {
     email = email ? email.trim().toLowerCase() : email;
     password = password ? password.trim() : password;
 
-    console.log('=== LOGIN REQUEST ===');
-    console.log('Email (normalized):', email);
-    console.log('Password length:', password?.length);
-
     // Validation
     if (!email || !password) {
-      console.log('Missing email or password');
       return NextResponse.json(
         { success: false, error: 'Email and password are required' },
         { status: 400 }
@@ -42,30 +37,17 @@ export async function POST(request: NextRequest) {
     }
 
     // Find user by email (include password field)
-    console.log('Looking for user with email:', email);
     const user = await User.findOne({ email }).select('+password');
-    console.log('User found:', !!user);
     
     if (!user) {
-      console.log('❌ User not found with email:', email);
       return NextResponse.json(
         { success: false, error: 'Email or Password something Wrong.' },
         { status: 401 }
       );
     }
 
-    console.log('User details:', {
-      email: user.email,
-      username: user.username,
-      role: user.role,
-      isActive: user.isActive,
-      hasPassword: !!user.password,
-      passwordLength: user.password?.length || 0
-    });
-
     // Check if user is active
     if (!user.isActive) {
-      console.log('❌ User is not active');
       return NextResponse.json(
         { success: false, error: 'Email or Password something Wrong.' },
         { status: 401 }
@@ -74,7 +56,6 @@ export async function POST(request: NextRequest) {
 
     // Check if company is approved (for company users)
     if (user.role === 'company' && !user.isCompanyApproved) {
-      console.log('❌ Company user is not approved');
       return NextResponse.json(
         { success: false, error: 'Wait for the teacher or administrator to click Agree.' },
         { status: 403 }
@@ -83,7 +64,6 @@ export async function POST(request: NextRequest) {
 
     // Check if teacher is confirmed (for teacher users only, not admin)
     if (user.role === 'teacher' && !user.isTeacherConfirmed) {
-      console.log('❌ Teacher user is not confirmed');
       return NextResponse.json(
         { success: false, error: 'Wait for the teacher or administrator to click Agree.' },
         { status: 403 }
@@ -91,7 +71,6 @@ export async function POST(request: NextRequest) {
     }
 
     // Verify password
-    console.log('🔐 Verifying password...');
     if (!user.password) {
       console.error('❌ Password field is missing from user object!');
       return NextResponse.json(
@@ -101,18 +80,14 @@ export async function POST(request: NextRequest) {
     }
     
     const isPasswordValid = await user.comparePassword(password);
-    console.log('Password valid:', isPasswordValid);
     
     if (!isPasswordValid) {
-      console.log('❌ Invalid password');
       return NextResponse.json(
         { success: false, error: 'Email or Password something Wrong.' },
         { status: 401 }
       );
     }
     
-    console.log('✅ Password verified successfully');
-
     // Generate JWT token
     const token = jwt.sign(
       { 

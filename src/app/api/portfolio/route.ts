@@ -38,12 +38,6 @@ export async function GET(request: NextRequest) {
       isAdminOrTeacher = false;
     }
 
-    console.log('📋 Portfolio GET request:', {
-      category,
-      includePending,
-      isAdminOrTeacher
-    });
-
     let query: any = {};
 
     // Filter by category
@@ -57,12 +51,7 @@ export async function GET(request: NextRequest) {
       query.status = 'approved';
     }
 
-    console.log('📋 Portfolio query:', JSON.stringify(query, null, 2));
-
     const portfolios = await Portfolio.find(query).sort({ id: 1 });
-
-    console.log('📋 Found portfolios:', portfolios.length);
-    console.log('📋 Portfolio statuses:', portfolios.map(p => ({ id: p.id, status: p.status, category: p.category })));
 
     return NextResponse.json({
       success: true,
@@ -93,12 +82,9 @@ export async function GET(request: NextRequest) {
 // POST /api/portfolio - Create new portfolio item
 export async function POST(request: NextRequest) {
   try {
-    console.log('📝 Portfolio creation request received');
     await connectDB();
-    console.log('✅ Database connected');
 
     const body = await request.json();
-    console.log('📦 Request body:', JSON.stringify(body, null, 2));
 
     // Validate required fields (technologies and features are optional, will use defaults if empty)
     const requiredFields = ['category', 'title', 'description', 'fullDescription', 'duration', 'client'];
@@ -133,7 +119,6 @@ export async function POST(request: NextRequest) {
       } else {
         body.image = 'https://placehold.co/800x600/FCD34D/1F2937?text=No+Image';
       }
-      console.log('⚠️  Image field was empty, using uploadedFile or placeholder');
     }
 
     // Ensure technologies and features are arrays (use defaults if empty or missing)
@@ -144,17 +129,9 @@ export async function POST(request: NextRequest) {
       ? body.features
       : ['Portfolio Item'];
 
-    if (!Array.isArray(body.technologies) || body.technologies.length === 0) {
-      console.log('⚠️  Technologies array was empty or missing, using default: ["General"]');
-    }
-    if (!Array.isArray(body.features) || body.features.length === 0) {
-      console.log('⚠️  Features array was empty or missing, using default: ["Portfolio Item"]');
-    }
-
     // Get the highest ID and increment it
     const lastPortfolio = await Portfolio.findOne().sort({ id: -1 });
     const newId = lastPortfolio ? lastPortfolio.id + 1 : 1;
-    console.log('🆔 Generated new portfolio ID:', newId);
 
     // Set status to pending and get submittedBy from request (if available)
     const portfolio = new Portfolio({
@@ -166,9 +143,7 @@ export async function POST(request: NextRequest) {
       submittedBy: body.submittedBy || '' // User ID or email who submitted
     });
 
-    console.log('💾 Attempting to save portfolio...');
     await portfolio.save();
-    console.log('✅ Portfolio saved successfully:', portfolio._id);
 
     return NextResponse.json({
       success: true,

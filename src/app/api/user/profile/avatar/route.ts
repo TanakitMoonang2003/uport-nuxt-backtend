@@ -70,7 +70,6 @@ export async function POST(request: NextRequest) {
       );
     }
     
-    console.log('✅ Avatar uploaded for:', user.email);
     
     return NextResponse.json({
       success: true,

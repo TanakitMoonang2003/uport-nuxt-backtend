@@ -38,7 +38,6 @@ export async function GET(request: NextRequest) {
                 );
             }
 
-            console.log('✅ Profile fetched for:', user.email);
 
             return NextResponse.json({
                 success: true,
@@ -141,7 +140,6 @@ export async function PUT(request: NextRequest) {
                 );
             }
 
-            console.log('✅ Profile updated for:', user.email);
 
             return NextResponse.json({
                 success: true,

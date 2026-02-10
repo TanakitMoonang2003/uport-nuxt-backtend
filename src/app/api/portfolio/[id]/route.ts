@@ -60,13 +60,6 @@ export async function PUT(
       const jwt = require('jsonwebtoken');
       const decoded = jwt.verify(token, process.env.JWT_SECRET || 'fallback-secret');
 
-      console.log('🔐 User attempting to update portfolio:', {
-        userId: decoded.userId,
-        email: decoded.email,
-        role: decoded.role,
-        portfolioId: params.id
-      });
-
       // Get existing portfolio
       const existingPortfolio = await Portfolio.findOne({ id: parseInt(params.id) });
 
@@ -85,12 +78,6 @@ export async function PUT(
 
       // Check ownership (allow owner or admin)
       if (existingPortfolio.submittedBy !== decoded.email && decoded.role !== 'admin') {
-        console.log('❌ Permission denied:', {
-          portfolioOwner: existingPortfolio.submittedBy,
-          requestingUser: decoded.email,
-          userRole: decoded.role
-        });
-
         return NextResponse.json(
           { success: false, error: 'You do not have permission to edit this portfolio' },
           {
@@ -103,8 +90,6 @@ export async function PUT(
         );
       }
 
-      console.log('✅ Authorization successful - updating portfolio');
-
       const body = await request.json();
 
       // Update portfolio
@@ -113,8 +98,6 @@ export async function PUT(
         body,
         { new: true, runValidators: true }
       );
-
-      console.log('✅ Portfolio updated successfully:', portfolio.id);
 
       return NextResponse.json({
         success: true,

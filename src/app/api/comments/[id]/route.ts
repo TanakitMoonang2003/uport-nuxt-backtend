@@ -55,23 +55,13 @@ export async function DELETE(
                 decoded.role === 'admin';
 
             if (!canDelete) {
-                console.log('❌ Delete permission denied:', {
-                    commentAuthor: comment.authorEmail,
-                    portfolioOwner: portfolio.submittedBy,
-                    requestingUser: decoded.email,
-                    userRole: decoded.role
-                });
-
                 return NextResponse.json(
                     { success: false, error: 'You do not have permission to delete this comment' },
                     { status: 403 }
                 );
             }
 
-            // Delete the comment
             await Comment.deleteOne({ id: commentId });
-
-            console.log('✅ Comment deleted:', commentId, 'by', decoded.email);
 
             return NextResponse.json({
                 success: true,

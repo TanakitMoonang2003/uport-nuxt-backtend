@@ -110,7 +110,6 @@ export async function POST(
     user.isActive = !user.isActive;
     await user.save();
 
-    console.log(`✅ User ${user.email} status toggled to ${user.isActive ? 'active' : 'inactive'}`);
 
     // Return updated user (without password)
     const updatedUser = await User.findById(userId).select('-password');

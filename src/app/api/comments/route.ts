@@ -31,12 +31,9 @@ export async function GET(request: NextRequest) {
                 const token = authHeader.replace('Bearer ', '');
                 decoded = jwt.verify(token, process.env.JWT_SECRET || 'fallback-secret') as any;
             } catch (jwtError: any) {
-                console.warn('JWT verification failed (GET /comments, will continue as guest):', jwtError.message);
                 decoded = null;
             }
         }
-
-        console.log('🔍 Fetching comments for portfolio:', portfolioId, 'User:', decoded?.email || 'guest');
 
         // Get portfolio (ถ้าไม่มี = 404)
         const portfolio = await Portfolio.findOne({ id: parseInt(portfolioId) });
@@ -163,7 +160,6 @@ export async function POST(request: NextRequest) {
             // ใช้ username ล่าสุดจากตาราง User แทนที่จะพึ่ง payload ใน token
             const userDoc = await User.findById(decoded.userId).select('username email role');
 
-            // Create comment
             const comment = await Comment.create({
                 id: nextId,
                 portfolioId: parseInt(portfolioId),
@@ -172,8 +168,6 @@ export async function POST(request: NextRequest) {
                 authorRole: (userDoc?.role as any) || decoded.role || 'user',
                 content: content.trim()
             });
-
-            console.log('✅ Comment created:', comment.id, 'by', decoded.email);
 
             return NextResponse.json({
                 success: true,

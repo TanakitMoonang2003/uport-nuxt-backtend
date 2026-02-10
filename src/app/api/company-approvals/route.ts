@@ -22,10 +22,8 @@ export async function GET(request: NextRequest) {
     
     // Get authorization header
     const authHeader = request.headers.get('authorization');
-    console.log('🔍 Company Approvals - Auth Header:', authHeader);
     
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      console.log('❌ Company Approvals - No valid auth header');
       return NextResponse.json(
         { success: false, error: 'Authorization token required' },
         { 
@@ -40,13 +38,10 @@ export async function GET(request: NextRequest) {
     }
 
     const token = authHeader.substring(7);
-    console.log('🔍 Company Approvals - Extracted token:', token);
-    console.log('🔍 Company Approvals - Token length:', token.length);
     
     let decoded;
     try {
       decoded = jwt.verify(token, process.env.JWT_SECRET || 'fallback-secret') as any;
-      console.log('✅ Company Approvals - Token verified successfully');
     } catch (jwtError) {
       console.error('❌ Company Approvals - JWT verification failed:', jwtError);
       return NextResponse.json(
@@ -84,7 +79,6 @@ export async function GET(request: NextRequest) {
       isCompanyApproved: false
     }).select('-password');
 
-    console.log('✅ Company Approvals - Found pending companies:', pendingCompanies.length);
 
     return NextResponse.json({
       success: true,

@@ -7,10 +7,6 @@ function getApiInstance(): brevo.TransactionalEmailsApi {
   if (!apiInstance) {
     const apiKey = process.env.BREVO_API_KEY;
     
-    console.log('🔧 Initializing Brevo API client...');
-    console.log('   BREVO_API_KEY exists:', !!apiKey);
-    console.log('   BREVO_API_KEY starts with:', apiKey ? apiKey.substring(0, 10) + '...' : 'N/A');
-    
     if (!apiKey) {
       const error = new Error('BREVO_API_KEY is not set in environment variables');
       console.error('❌', error.message);
@@ -32,7 +28,7 @@ function getApiInstance(): brevo.TransactionalEmailsApi {
       apiKey
     );
     
-    console.log('✅ Brevo API client initialized (API key length:', apiKey.length, ')');
+    
   }
   return apiInstance;
 }
