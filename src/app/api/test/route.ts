@@ -30,7 +30,7 @@ export async function POST(request: NextRequest) {
     
     const origin = request.headers.get('origin');
     return addCorsHeaders(response, origin || undefined);
-  } catch (error) {
+  } catch {
     const response = NextResponse.json({
       success: false,
       error: 'Invalid JSON'

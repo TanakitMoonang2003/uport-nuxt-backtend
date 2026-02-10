@@ -4,7 +4,7 @@ import User from '@/models/User';
 import jwt from 'jsonwebtoken';
 
 // Handle CORS preflight requests
-export async function OPTIONS(_request: NextRequest) {
+export async function OPTIONS() {
   return new Response(null, {
     status: 200,
     headers: {

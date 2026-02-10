@@ -11,7 +11,7 @@ interface AuthTokenPayload extends jwt.JwtPayload {
 }
 
 // Handle CORS preflight requests
-export async function OPTIONS(_request: NextRequest) {
+export async function OPTIONS() {
   return new Response(null, {
     status: 200,
     headers: {
@@ -51,7 +51,7 @@ async function verifyAdmin(request: NextRequest) {
 // PUT /api/admin/users/[id] - Update user
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
     await connectDB();
@@ -71,7 +71,7 @@ export async function PUT(
       );
     }
 
-    const userId = params.id;
+    const { id: userId } = await context.params;
     const body = await request.json();
     const { username, email, role } = body;
 
@@ -134,7 +134,7 @@ export async function PUT(
 // PATCH /api/admin/users/[id]/status - Toggle user status
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
     await connectDB();
@@ -154,7 +154,7 @@ export async function PATCH(
       );
     }
 
-    const userId = params.id;
+    const { id: userId } = await context.params;
     const body = await request.json();
     const { isActive } = body;
 
@@ -227,7 +227,7 @@ export async function PATCH(
 // DELETE /api/admin/users/[id] - Delete user
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
     await connectDB();
@@ -247,7 +247,7 @@ export async function DELETE(
       );
     }
 
-    const userId = params.id;
+    const { id: userId } = await context.params;
 
     // Find user
     const user = await User.findById(userId);

@@ -11,7 +11,7 @@ interface AuthTokenPayload extends jwt.JwtPayload {
 }
 
 // Handle CORS preflight requests
-export async function OPTIONS(request: NextRequest) {
+export async function OPTIONS() {
   return new Response(null, {
     status: 200,
     headers: {
@@ -50,7 +50,7 @@ export async function POST(request: NextRequest) {
         token,
         process.env.JWT_SECRET || 'fallback-secret'
       ) as AuthTokenPayload;
-    } catch (error) {
+    } catch {
       return NextResponse.json(
         { success: false, error: 'Invalid token' },
         { 

@@ -1,9 +1,9 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import User from '@/models/User';
 
 // Handle CORS preflight requests
-export async function OPTIONS(_request: NextRequest) {
+export async function OPTIONS() {
   return new Response(null, {
     status: 200,
     headers: {
@@ -15,7 +15,7 @@ export async function OPTIONS(_request: NextRequest) {
 }
 
 // GET /api/admin/pending-companies - Get all pending company requests
-export async function GET(_request: NextRequest) {
+export async function GET() {
   try {
     await connectDB();
     

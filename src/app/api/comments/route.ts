@@ -40,7 +40,7 @@ export async function GET(request: NextRequest) {
                     token,
                     process.env.JWT_SECRET || 'fallback-secret'
                 ) as AuthTokenPayload;
-            } catch (jwtError: unknown) {
+            } catch {
                 decoded = null;
             }
         }

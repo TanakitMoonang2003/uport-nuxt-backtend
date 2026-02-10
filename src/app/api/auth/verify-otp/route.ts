@@ -3,7 +3,7 @@ import connectDB from '@/lib/mongodb';
 import OTP from '@/models/OTP';
 
 // Handle CORS preflight requests
-export async function OPTIONS(_request: NextRequest) {
+export async function OPTIONS() {
   return new Response(null, {
     status: 200,
     headers: {

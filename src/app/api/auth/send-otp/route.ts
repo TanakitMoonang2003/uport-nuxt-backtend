@@ -4,7 +4,7 @@ import OTP from '@/models/OTP';
 import { sendOTPEmail } from '@/lib/email';
 
 // Handle CORS preflight requests
-export async function OPTIONS(_request: NextRequest) {
+export async function OPTIONS() {
   return new Response(null, {
     status: 200,
     headers: {

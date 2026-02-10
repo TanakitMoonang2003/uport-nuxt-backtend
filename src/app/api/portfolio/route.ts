@@ -11,7 +11,7 @@ interface AuthTokenPayload extends jwt.JwtPayload {
 }
 
 // Handle CORS preflight requests
-export async function OPTIONS(request: NextRequest) {
+export async function OPTIONS() {
   return new Response(null, {
     status: 200,
     headers: {
@@ -43,7 +43,7 @@ export async function GET(request: NextRequest) {
         ) as AuthTokenPayload;
         isAdminOrTeacher = decoded.role === 'admin' || decoded.role === 'teacher';
       }
-    } catch (authError) {
+    } catch {
       // Not authenticated or invalid token - treat as public user
       isAdminOrTeacher = false;
     }
