@@ -22,19 +22,18 @@ export function addCorsHeaders(response: NextResponse, origin?: string) {
   ];
 
 
-  if (origin && allowedOrigins.includes(origin)) {
-    response.headers.set('Access-Control-Allow-Origin', origin);
-  } else {
-    response.headers.set('Access-Control-Allow-Origin', '*');
-  }
+  const allowOrigin = origin && allowedOrigins.includes(origin) ? origin : allowedOrigins[0];
 
-  response.headers.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-  response.headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  response.headers.set('Access-Control-Allow-Origin', allowOrigin);
+  response.headers.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
+  response.headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
   response.headers.set('Access-Control-Allow-Credentials', 'true');
+  response.headers.set('Access-Control-Max-Age', '86400');
+
   return response;
 }
 
-export function createCorsResponse(status: number = 200, origin?: string) {
+export function createCorsResponse(status: number = 204, origin?: string) {
   // Get allowed origins from environment or use defaults
   const envOrigins = process.env.ALLOWED_ORIGINS?.split(',').map(o => o.trim()) || [];
 
@@ -54,15 +53,16 @@ export function createCorsResponse(status: number = 200, origin?: string) {
     ...envOrigins,
     'null' // For file:// protocol testing
   ];
-  const allowOrigin = origin && allowedOrigins.includes(origin) ? origin : '*';
+  const allowOrigin = origin && allowedOrigins.includes(origin) ? origin : allowedOrigins[0];
 
-  return new Response(null, {
+  return new NextResponse(null, {
     status,
     headers: {
       'Access-Control-Allow-Origin': allowOrigin,
-      'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+      'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, PATCH, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Requested-With',
       'Access-Control-Allow-Credentials': 'true',
+      'Access-Control-Max-Age': '86400',
     },
   });
 }

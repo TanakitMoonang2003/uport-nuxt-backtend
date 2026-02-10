@@ -32,14 +32,14 @@ export function middleware(request: NextRequest) {
 
   // Handle preflight requests (OPTIONS)
   if (request.method === 'OPTIONS') {
-    return new Response(null, {
-      status: 200,
+    return new NextResponse(null, {
+      status: 204, // No Content - ถูกต้องสำหรับ preflight
       headers: {
-        'Access-Control-Allow-Origin': allowOrigin || '*',
-        'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+        'Access-Control-Allow-Origin': allowOrigin,
+        'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, PATCH, OPTIONS',
         'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Requested-With',
         'Access-Control-Allow-Credentials': 'true',
-        'Access-Control-Max-Age': '86400',
+        'Access-Control-Max-Age': '86400', // Cache preflight for 24 hours
       },
     });
   }
