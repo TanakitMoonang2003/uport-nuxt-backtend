@@ -2,22 +2,18 @@ import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import User from '@/models/User';
 import jwt from 'jsonwebtoken';
+import { addCorsHeaders, createCorsResponse } from '@/lib/cors';
 
 // Handle CORS preflight requests
-export async function OPTIONS() {
-  return new Response(null, {
-    status: 200,
-    headers: {
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-    },
-  });
+export async function OPTIONS(request: NextRequest) {
+  const origin = request.headers.get('origin') || undefined;
+  return createCorsResponse(200, origin);
 }
 
 // POST /api/auth/login - Login user
 export async function POST(request: NextRequest) {
   try {
+    const origin = request.headers.get('origin') || undefined;
     await connectDB();
     
     const body = await request.json();
@@ -30,62 +26,69 @@ export async function POST(request: NextRequest) {
 
     // Validation
     if (!email || !password) {
-      return NextResponse.json(
+      const response = NextResponse.json(
         { success: false, error: 'Email and password are required' },
         { status: 400 }
       );
+      return addCorsHeaders(response, origin);
     }
 
     // Find user by email (include password field)
     const user = await User.findOne({ email }).select('+password');
     
     if (!user) {
-      return NextResponse.json(
+      const response = NextResponse.json(
         { success: false, error: 'Email or Password something Wrong.' },
         { status: 401 }
       );
+      return addCorsHeaders(response, origin);
     }
 
     // Check if user is active
     if (!user.isActive) {
-      return NextResponse.json(
+      const response = NextResponse.json(
         { success: false, error: 'Email or Password something Wrong.' },
         { status: 401 }
       );
+      return addCorsHeaders(response, origin);
     }
 
     // Check if company is approved (for company users)
     if (user.role === 'company' && !user.isCompanyApproved) {
-      return NextResponse.json(
+      const response = NextResponse.json(
         { success: false, error: 'Wait for the teacher or administrator to click Agree.' },
         { status: 403 }
       );
+      return addCorsHeaders(response, origin);
     }
 
     // Check if teacher is confirmed (for teacher users only, not admin)
     if (user.role === 'teacher' && !user.isTeacherConfirmed) {
-      return NextResponse.json(
+      const response = NextResponse.json(
         { success: false, error: 'Wait for the teacher or administrator to click Agree.' },
         { status: 403 }
       );
+      return addCorsHeaders(response, origin);
     }
 
     // Verify password
     if (!user.password) {
       console.error('❌ Password field is missing from user object!');
-      return NextResponse.json(
+      const response = NextResponse.json(
         { success: false, error: 'Email or Password something Wrong.' },
         { status: 401 }
       );
+      return addCorsHeaders(response, origin);
     }
     
     const isPasswordValid = await user.comparePassword(password);
     
     if (!isPasswordValid) {
-      return NextResponse.json(
+      const response = NextResponse.json(
         { success: false, error: 'Email or Password something Wrong.' },
         { status: 401 }
       );
+      return addCorsHeaders(response, origin);
     }
     
     // Generate JWT token
@@ -111,30 +114,25 @@ export async function POST(request: NextRequest) {
       token
     };
 
-    return NextResponse.json({
-      success: true,
-      message: 'Login successful',
-      data: userResponse
-    }, {
-      headers: {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-        'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+    const response = NextResponse.json(
+      {
+        success: true,
+        message: 'Login successful',
+        data: userResponse,
+      },
+      {
+        status: 200,
       }
-    });
+    );
+    return addCorsHeaders(response, origin);
 
   } catch (error) {
     console.error('Login error:', error);
-    return NextResponse.json(
+    const origin = request.headers.get('origin') || undefined;
+    const response = NextResponse.json(
       { success: false, error: 'Login failed' },
-      { 
-        status: 500,
-        headers: {
-          'Access-Control-Allow-Origin': '*',
-          'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-          'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-        }
-      }
+      { status: 500 }
     );
+    return addCorsHeaders(response, origin);
   }
 }
