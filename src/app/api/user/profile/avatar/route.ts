@@ -27,10 +27,19 @@ export async function POST(request: NextRequest) {
     const token = authHeader.substring(7);
 
     // Verify token
-    const decoded = jwt.verify(
-      token,
-      process.env.JWT_SECRET || 'fallback-secret'
-    ) as AuthTokenPayload;
+    let decoded: AuthTokenPayload;
+    try {
+      decoded = jwt.verify(
+        token,
+        process.env.JWT_SECRET || 'fallback-secret'
+      ) as AuthTokenPayload;
+    } catch (jwtError) {
+      console.error('JWT verification failed in /api/user/profile/avatar:', jwtError);
+      return NextResponse.json(
+        { success: false, error: 'Invalid or expired token' },
+        { status: 401 }
+      );
+    }
 
     // Get form data
     const formData = await request.formData();
@@ -86,10 +95,14 @@ export async function POST(request: NextRequest) {
       avatarUrl: user.avatarUrl,
       data: user
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error uploading avatar:', error);
     return NextResponse.json(
-      { success: false, error: 'Failed to upload avatar' },
+      {
+        success: false,
+        error: 'Failed to upload avatar',
+        message: error.message
+      },
       { status: 500 }
     );
   }

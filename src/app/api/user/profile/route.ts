@@ -27,10 +27,19 @@ export async function GET(request: NextRequest) {
     const token = authHeader.substring(7);
 
     // Verify token
-    const decoded = jwt.verify(
-      token,
-      process.env.JWT_SECRET || 'fallback-secret'
-    ) as AuthTokenPayload;
+    let decoded: AuthTokenPayload;
+    try {
+      decoded = jwt.verify(
+        token,
+        process.env.JWT_SECRET || 'fallback-secret'
+      ) as AuthTokenPayload;
+    } catch (jwtError) {
+      console.error('JWT verification failed in /api/user/profile:', jwtError);
+      return NextResponse.json(
+        { success: false, error: 'Invalid or expired token' },
+        { status: 401 }
+      );
+    }
 
     // Find user by ID
     const user = await User.findById(decoded.userId).select('-password');
@@ -46,10 +55,14 @@ export async function GET(request: NextRequest) {
       success: true,
       data: user
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error fetching user profile:', error);
     return NextResponse.json(
-      { success: false, error: 'Failed to fetch user profile' },
+      {
+        success: false,
+        error: 'Failed to fetch user profile',
+        message: error.message
+      },
       { status: 500 }
     );
   }
@@ -72,12 +85,27 @@ export async function PUT(request: NextRequest) {
     const token = authHeader.substring(7);
 
     // Verify token
-    const decoded = jwt.verify(
-      token,
-      process.env.JWT_SECRET || 'fallback-secret'
-    ) as AuthTokenPayload;
+    let decoded: AuthTokenPayload;
+    try {
+      decoded = jwt.verify(
+        token,
+        process.env.JWT_SECRET || 'fallback-secret'
+      ) as AuthTokenPayload;
+    } catch (jwtError) {
+      console.error('JWT verification failed in PUT /api/user/profile:', jwtError);
+      return NextResponse.json(
+        { success: false, error: 'Invalid or expired token' },
+        { status: 401 }
+      );
+    }
 
     const body = await request.json();
+
+    // Check if User model exists
+    if (!User) {
+      console.error('User model is not defined!');
+      throw new Error('User model is not defined');
+    }
 
     // Update user profile
     const user = await User.findByIdAndUpdate(
@@ -97,10 +125,14 @@ export async function PUT(request: NextRequest) {
       success: true,
       data: user
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error updating user profile:', error);
     return NextResponse.json(
-      { success: false, error: 'Failed to update user profile' },
+      {
+        success: false,
+        error: 'Failed to update user profile',
+        message: error.message
+      },
       { status: 500 }
     );
   }
