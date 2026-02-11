@@ -10,6 +10,15 @@ interface AuthTokenPayload extends jwt.JwtPayload {
   username?: string;
 }
 
+// Set body size limit for avatar uploads (base64)
+export const config = {
+  api: {
+    bodyParser: {
+      sizeLimit: '10mb',
+    },
+  },
+};
+
 // GET /api/user/profile - Get user profile
 export async function GET(request: NextRequest) {
   try {

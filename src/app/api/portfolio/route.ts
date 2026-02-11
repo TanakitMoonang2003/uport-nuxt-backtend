@@ -11,6 +11,15 @@ interface AuthTokenPayload extends jwt.JwtPayload {
 }
 
 
+// Set body size limit for large image uploads (base64)
+export const config = {
+  api: {
+    bodyParser: {
+      sizeLimit: '10mb',
+    },
+  },
+};
+
 // GET /api/portfolio - Get all portfolio items
 export async function GET(request: NextRequest) {
   try {
@@ -56,14 +65,15 @@ export async function GET(request: NextRequest) {
       success: true,
       data: portfolios
     }, {
-      
+
     });
   } catch (error) {
     console.error('Error fetching portfolios:', error);
     return NextResponse.json(
       { success: false, error: 'Failed to fetch portfolios' },
       {
-        status: 500 }
+        status: 500
+      }
     );
   }
 }
@@ -90,7 +100,8 @@ export async function POST(request: NextRequest) {
           missingFields: missingFields
         },
         {
-          status: 400 }
+          status: 400
+        }
       );
     }
 
@@ -132,7 +143,8 @@ export async function POST(request: NextRequest) {
       success: true,
       data: portfolio
     }, {
-      status: 201 });
+      status: 201
+    });
   } catch (error: unknown) {
     console.error('❌ Error creating portfolio:');
     if (error instanceof Error) {
@@ -166,7 +178,8 @@ export async function POST(request: NextRequest) {
           validationErrors: validationErrors
         },
         {
-          status: 400 }
+          status: 400
+        }
       );
     }
 
@@ -185,7 +198,8 @@ export async function POST(request: NextRequest) {
           error: 'Portfolio with this ID already exists'
         },
         {
-          status: 409 }
+          status: 409
+        }
       );
     }
 
@@ -200,7 +214,8 @@ export async function POST(request: NextRequest) {
             : undefined
       },
       {
-        status: 500 }
+        status: 500
+      }
     );
   }
 }
