@@ -14,7 +14,7 @@ interface AuthTokenPayload extends jwt.JwtPayload {
 export async function POST(request: NextRequest) {
   try {
     await connectDB();
-    
+
     // Get token from Authorization header
     const authHeader = request.headers.get('authorization');
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
@@ -23,26 +23,26 @@ export async function POST(request: NextRequest) {
         { status: 401 }
       );
     }
-    
+
     const token = authHeader.substring(7);
-    
+
     // Verify token
     const decoded = jwt.verify(
       token,
-      process.env.JWT_SECRET || 'yourlsajdlasdna;skdh;oinklengoinnds'
+      process.env.JWT_SECRET || 'fallback-secret'
     ) as AuthTokenPayload;
-    
+
     // Get form data
     const formData = await request.formData();
     const file = formData.get('file') as File;
-    
+
     if (!file) {
       return NextResponse.json(
         { success: false, error: 'No file provided' },
         { status: 400 }
       );
     }
-    
+
     // Validate file type
     const validTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/webp'];
     if (!validTypes.includes(file.type)) {
@@ -51,7 +51,7 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       );
     }
-    
+
     // Validate file size (max 1MB)
     if (file.size > 1000000) {
       return NextResponse.json(
@@ -59,28 +59,28 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       );
     }
-    
+
     // Convert file to base64
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
     const base64 = buffer.toString('base64');
     const avatarUrl = `data:${file.type};base64,${base64}`;
-    
+
     // Update user avatar
     const user = await User.findByIdAndUpdate(
       decoded.userId,
       { avatarUrl },
       { new: true, runValidators: true }
     ).select('-password');
-    
+
     if (!user) {
       return NextResponse.json(
         { success: false, error: 'User not found' },
         { status: 404 }
       );
     }
-    
-    
+
+
     return NextResponse.json({
       success: true,
       avatarUrl: user.avatarUrl,

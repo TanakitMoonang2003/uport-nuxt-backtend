@@ -14,7 +14,7 @@ interface AuthTokenPayload extends jwt.JwtPayload {
 export async function GET(request: NextRequest) {
   try {
     await connectDB();
-    
+
     // Get token from Authorization header
     const authHeader = request.headers.get('authorization');
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
@@ -23,25 +23,25 @@ export async function GET(request: NextRequest) {
         { status: 401 }
       );
     }
-    
+
     const token = authHeader.substring(7);
-    
+
     // Verify token
     const decoded = jwt.verify(
       token,
-      process.env.JWT_SECRET || 'yourlsajdlasdna;skdh;oinklengoinnds'
+      process.env.JWT_SECRET || 'fallback-secret'
     ) as AuthTokenPayload;
-    
+
     // Find user by ID
     const user = await User.findById(decoded.userId).select('-password');
-    
+
     if (!user) {
       return NextResponse.json(
         { success: false, error: 'User not found' },
         { status: 404 }
       );
     }
-    
+
     return NextResponse.json({
       success: true,
       data: user
@@ -59,7 +59,7 @@ export async function GET(request: NextRequest) {
 export async function PUT(request: NextRequest) {
   try {
     await connectDB();
-    
+
     // Get token from Authorization header
     const authHeader = request.headers.get('authorization');
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
@@ -68,31 +68,31 @@ export async function PUT(request: NextRequest) {
         { status: 401 }
       );
     }
-    
+
     const token = authHeader.substring(7);
-    
+
     // Verify token
     const decoded = jwt.verify(
       token,
-      process.env.JWT_SECRET || 'yourlsajdlasdna;skdh;oinklengoinnds'
+      process.env.JWT_SECRET || 'fallback-secret'
     ) as AuthTokenPayload;
-    
+
     const body = await request.json();
-    
+
     // Update user profile
     const user = await User.findByIdAndUpdate(
       decoded.userId,
       body,
       { new: true, runValidators: true }
     ).select('-password');
-    
+
     if (!user) {
       return NextResponse.json(
         { success: false, error: 'User not found' },
         { status: 404 }
       );
     }
-    
+
     return NextResponse.json({
       success: true,
       data: user
