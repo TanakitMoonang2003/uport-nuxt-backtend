@@ -14,12 +14,7 @@ interface AuthTokenPayload extends jwt.JwtPayload {
 export async function OPTIONS() {
   return new Response(null, {
     status: 200,
-    headers: {
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-    },
-  });
+     });
 }
 
 // GET /api/teacher-confirmations - Get pending teacher registrations for companies
@@ -78,26 +73,14 @@ export async function GET(request: NextRequest) {
       success: true,
       data: pendingTeachers
     }, {
-      status: 200,
-      headers: {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-        'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-      }
-    });
+      status: 200 });
 
   } catch (error) {
     console.error('Error fetching teacher confirmations:', error);
     return NextResponse.json(
       { success: false, error: 'Failed to fetch teacher confirmations' },
       { 
-        status: 500,
-        headers: {
-          'Access-Control-Allow-Origin': '*',
-          'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-          'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-        }
-      }
+        status: 500 }
     );
   }
 }
@@ -177,26 +160,14 @@ export async function POST(request: NextRequest) {
       success: true,
       message: action === 'accept' ? 'Teacher registration confirmed' : 'Teacher registration rejected'
     }, {
-      status: 200,
-      headers: {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-        'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-      }
-    });
+      status: 200 });
 
   } catch (error) {
     console.error('Error processing teacher confirmation:', error);
     return NextResponse.json(
       { success: false, error: 'Failed to process teacher confirmation' },
       { 
-        status: 500,
-        headers: {
-          'Access-Control-Allow-Origin': '*',
-          'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-          'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-        }
-      }
+        status: 500 }
     );
   }
 }

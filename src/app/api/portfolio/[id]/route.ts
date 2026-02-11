@@ -56,12 +56,7 @@ export async function PUT(
       return NextResponse.json(
         { success: false, error: 'Unauthorized - No token provided' },
         {
-          status: 401, headers: {
-            'Access-Control-Allow-Origin': '*',
-            'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-            'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-          }
-        }
+          status: 401 }
       );
     }
 
@@ -79,12 +74,7 @@ export async function PUT(
         return NextResponse.json(
           { success: false, error: 'Portfolio not found' },
           {
-            status: 404, headers: {
-              'Access-Control-Allow-Origin': '*',
-              'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-              'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-            }
-          }
+            status: 404 }
         );
       }
 
@@ -93,12 +83,7 @@ export async function PUT(
         return NextResponse.json(
           { success: false, error: 'You do not have permission to edit this portfolio' },
           {
-            status: 403, headers: {
-              'Access-Control-Allow-Origin': '*',
-              'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-              'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-            }
-          }
+            status: 403 }
         );
       }
 
@@ -115,11 +100,7 @@ export async function PUT(
         success: true,
         data: portfolio
       }, {
-        headers: {
-          'Access-Control-Allow-Origin': '*',
-          'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-          'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-        }
+        
       });
 
     } catch (jwtError: unknown) {
@@ -127,12 +108,7 @@ export async function PUT(
       return NextResponse.json(
         { success: false, error: 'Invalid or expired token' },
         {
-          status: 401, headers: {
-            'Access-Control-Allow-Origin': '*',
-            'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-            'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-          }
-        }
+          status: 401 }
       );
     }
   } catch (error) {
@@ -140,12 +116,7 @@ export async function PUT(
     return NextResponse.json(
       { success: false, error: 'Failed to update portfolio' },
       {
-        status: 500, headers: {
-          'Access-Control-Allow-Origin': '*',
-          'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-          'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-        }
-      }
+        status: 500 }
     );
   }
 }

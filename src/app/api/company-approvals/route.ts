@@ -14,12 +14,7 @@ interface AuthTokenPayload extends jwt.JwtPayload {
 export async function OPTIONS() {
   return new Response(null, {
     status: 200,
-    headers: {
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-    },
-  });
+     });
 }
 
 // GET /api/company-approvals - Get pending company registrations
@@ -34,13 +29,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json(
         { success: false, error: 'Authorization token required' },
         { 
-          status: 401,
-          headers: {
-            'Access-Control-Allow-Origin': '*',
-            'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-            'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-          }
-        }
+          status: 401 }
       );
     }
 
@@ -57,13 +46,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json(
         { success: false, error: 'Invalid or expired token' },
         { 
-          status: 401,
-          headers: {
-            'Access-Control-Allow-Origin': '*',
-            'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-            'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-          }
-        }
+          status: 401 }
       );
     }
     
@@ -73,13 +56,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json(
         { success: false, error: 'Only Admin or Teacher can access company approvals' },
         { 
-          status: 403,
-          headers: {
-            'Access-Control-Allow-Origin': '*',
-            'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-            'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-          }
-        }
+          status: 403 }
       );
     }
 
@@ -94,26 +71,14 @@ export async function GET(request: NextRequest) {
       success: true,
       data: pendingCompanies
     }, {
-      status: 200,
-      headers: {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-        'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-      }
-    });
+      status: 200 });
 
   } catch (error) {
     console.error('Error fetching company approvals:', error);
     return NextResponse.json(
       { success: false, error: 'Failed to fetch company approvals' },
       { 
-        status: 500,
-        headers: {
-          'Access-Control-Allow-Origin': '*',
-          'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-          'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-        }
-      }
+        status: 500 }
     );
   }
 }
@@ -129,13 +94,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         { success: false, error: 'Authorization token required' },
         { 
-          status: 401,
-          headers: {
-            'Access-Control-Allow-Origin': '*',
-            'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-            'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-          }
-        }
+          status: 401 }
       );
     }
 
@@ -151,13 +110,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         { success: false, error: 'Only Admin or Teacher can approve company registrations' },
         { 
-          status: 403,
-          headers: {
-            'Access-Control-Allow-Origin': '*',
-            'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-            'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-          }
-        }
+          status: 403 }
       );
     }
 
@@ -168,13 +121,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         { success: false, error: 'Company ID and action are required' },
         { 
-          status: 400,
-          headers: {
-            'Access-Control-Allow-Origin': '*',
-            'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-            'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-          }
-        }
+          status: 400 }
       );
     }
 
@@ -182,13 +129,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         { success: false, error: 'Action must be either "approve" or "reject"' },
         { 
-          status: 400,
-          headers: {
-            'Access-Control-Allow-Origin': '*',
-            'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-            'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-          }
-        }
+          status: 400 }
       );
     }
 
@@ -203,13 +144,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         { success: false, error: 'Company not found or already processed' },
         { 
-          status: 404,
-          headers: {
-            'Access-Control-Allow-Origin': '*',
-            'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-            'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-          }
-        }
+          status: 404 }
       );
     }
 
@@ -229,26 +164,14 @@ export async function POST(request: NextRequest) {
       success: true,
       message: action === 'approve' ? 'Company registration approved' : 'Company registration rejected'
     }, {
-      status: 200,
-      headers: {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-        'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-      }
-    });
+      status: 200 });
 
   } catch (error) {
     console.error('Error processing company approval:', error);
     return NextResponse.json(
       { success: false, error: 'Failed to process company approval' },
       { 
-        status: 500,
-        headers: {
-          'Access-Control-Allow-Origin': '*',
-          'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-          'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-        }
-      }
+        status: 500 }
     );
   }
 }

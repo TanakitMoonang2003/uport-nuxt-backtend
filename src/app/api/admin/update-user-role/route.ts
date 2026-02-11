@@ -6,12 +6,7 @@ import User from '@/models/User';
 export async function OPTIONS() {
   return new Response(null, {
     status: 200,
-    headers: {
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-    },
-  });
+     });
 }
 
 // POST /api/admin/update-user-role - Update user role to admin
@@ -71,11 +66,7 @@ export async function POST(request: NextRequest) {
         role: updatedUser.role
       }
     }, {
-      headers: {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-        'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-      }
+      
     });
 
   } catch (error) {
@@ -83,13 +74,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(
       { success: false, error: 'Failed to update user role' },
       { 
-        status: 500,
-        headers: {
-          'Access-Control-Allow-Origin': '*',
-          'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-          'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-        }
-      }
+        status: 500 }
     );
   }
 }

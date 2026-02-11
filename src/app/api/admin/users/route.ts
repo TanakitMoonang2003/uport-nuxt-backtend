@@ -14,12 +14,7 @@ interface AuthTokenPayload extends jwt.JwtPayload {
 export async function OPTIONS(_request: NextRequest) {
   return new Response(null, {
     status: 200,
-    headers: {
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-    },
-  });
+     });
 }
 
 // GET /api/admin/users - Get all users
@@ -33,13 +28,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json(
         { success: false, error: 'Authorization token required' },
         { 
-          status: 401,
-          headers: {
-            'Access-Control-Allow-Origin': '*',
-            'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-            'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-          }
-        }
+          status: 401 }
       );
     }
 
@@ -54,13 +43,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json(
         { success: false, error: 'Invalid or expired token' },
         { 
-          status: 401,
-          headers: {
-            'Access-Control-Allow-Origin': '*',
-            'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-            'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-          }
-        }
+          status: 401 }
       );
     }
     
@@ -70,13 +53,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json(
         { success: false, error: 'Only Admin can access user management' },
         { 
-          status: 403,
-          headers: {
-            'Access-Control-Allow-Origin': '*',
-            'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-            'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-          }
-        }
+          status: 403 }
       );
     }
 
@@ -87,11 +64,7 @@ export async function GET(request: NextRequest) {
       success: true,
       data: users
     }, {
-      headers: {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-        'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-      }
+      
     });
 
   } catch (error: unknown) {
@@ -99,13 +72,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(
       { success: false, error: 'Failed to fetch users' },
       { 
-        status: 500,
-        headers: {
-          'Access-Control-Allow-Origin': '*',
-          'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-          'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-        }
-      }
+        status: 500 }
     );
   }
 }

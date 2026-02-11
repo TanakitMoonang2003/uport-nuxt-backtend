@@ -14,12 +14,7 @@ interface AuthTokenPayload extends jwt.JwtPayload {
 export async function OPTIONS() {
   return new Response(null, {
     status: 200,
-    headers: {
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-    },
-  });
+     });
 }
 
 // GET /api/portfolio/pending - Get all pending portfolios (for admin/teacher)
@@ -33,13 +28,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json(
         { success: false, error: 'Authentication required' },
         { 
-          status: 401,
-          headers: {
-            'Access-Control-Allow-Origin': '*',
-            'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-            'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-          }
-        }
+          status: 401 }
       );
     }
     
@@ -54,13 +43,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json(
         { success: false, error: 'Invalid token' },
         { 
-          status: 401,
-          headers: {
-            'Access-Control-Allow-Origin': '*',
-            'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-            'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-          }
-        }
+          status: 401 }
       );
     }
     
@@ -69,13 +52,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json(
         { success: false, error: 'Only admin or teacher can view pending portfolios' },
         { 
-          status: 403,
-          headers: {
-            'Access-Control-Allow-Origin': '*',
-            'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-            'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-          }
-        }
+          status: 403 }
       );
     }
     
@@ -88,11 +65,7 @@ export async function GET(request: NextRequest) {
       data: pendingPortfolios,
       count: pendingPortfolios.length
     }, {
-      headers: {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-        'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-      }
+      
     });
     
   } catch (error: unknown) {
@@ -100,13 +73,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(
       { success: false, error: 'Failed to fetch pending portfolios' },
       { 
-        status: 500,
-        headers: {
-          'Access-Control-Allow-Origin': '*',
-          'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-          'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-        }
-      }
+        status: 500 }
     );
   }
 }

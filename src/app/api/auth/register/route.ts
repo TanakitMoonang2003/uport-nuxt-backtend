@@ -7,12 +7,7 @@ import jwt from 'jsonwebtoken';
 export async function OPTIONS() {
   return new Response(null, {
     status: 200,
-    headers: {
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-    },
-  });
+     });
 }
 
 // POST /api/auth/register - Register new user
@@ -124,13 +119,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         { success: false, error: 'Failed to create user account' },
         { 
-          status: 500,
-          headers: {
-            'Access-Control-Allow-Origin': '*',
-            'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-            'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-          }
-        }
+          status: 500 }
       );
     }
 
@@ -162,26 +151,14 @@ export async function POST(request: NextRequest) {
       message: 'User registered successfully',
       data: userResponse
     }, { 
-      status: 201,
-      headers: {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-        'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-      }
-    });
+      status: 201 });
 
   } catch (error) {
     console.error('Registration error:', error);
     return NextResponse.json(
       { success: false, error: 'Registration failed' },
       { 
-        status: 500,
-        headers: {
-          'Access-Control-Allow-Origin': '*',
-          'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-          'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-        }
-      }
+        status: 500 }
     );
   }
 }

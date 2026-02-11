@@ -14,12 +14,7 @@ interface AuthTokenPayload extends jwt.JwtPayload {
 export async function OPTIONS(_request: NextRequest) {
   return new Response(null, {
     status: 200,
-    headers: {
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': 'POST, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-    },
-  });
+     });
 }
 
 // POST /api/admin/users/[id]/status - Toggle user status
@@ -36,13 +31,7 @@ export async function POST(
       return NextResponse.json(
         { success: false, error: 'Authorization token required' },
         {
-          status: 401,
-          headers: {
-            'Access-Control-Allow-Origin': '*',
-            'Access-Control-Allow-Methods': 'POST, OPTIONS',
-            'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-          }
-        }
+          status: 401 }
       );
     }
 
@@ -57,13 +46,7 @@ export async function POST(
       return NextResponse.json(
         { success: false, error: 'Invalid or expired token' },
         {
-          status: 401,
-          headers: {
-            'Access-Control-Allow-Origin': '*',
-            'Access-Control-Allow-Methods': 'POST, OPTIONS',
-            'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-          }
-        }
+          status: 401 }
       );
     }
 
@@ -73,13 +56,7 @@ export async function POST(
       return NextResponse.json(
         { success: false, error: 'Only Admin can perform this action' },
         {
-          status: 403,
-          headers: {
-            'Access-Control-Allow-Origin': '*',
-            'Access-Control-Allow-Methods': 'POST, OPTIONS',
-            'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-          }
-        }
+          status: 403 }
       );
     }
 
@@ -91,13 +68,7 @@ export async function POST(
       return NextResponse.json(
         { success: false, error: 'User not found' },
         {
-          status: 404,
-          headers: {
-            'Access-Control-Allow-Origin': '*',
-            'Access-Control-Allow-Methods': 'POST, OPTIONS',
-            'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-          }
-        }
+          status: 404 }
       );
     }
 
@@ -106,13 +77,7 @@ export async function POST(
       return NextResponse.json(
         { success: false, error: 'You cannot deactivate yourself' },
         {
-          status: 400,
-          headers: {
-            'Access-Control-Allow-Origin': '*',
-            'Access-Control-Allow-Methods': 'POST, OPTIONS',
-            'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-          }
-        }
+          status: 400 }
       );
     }
 
@@ -129,11 +94,7 @@ export async function POST(
       message: `User ${user.isActive ? 'activated' : 'deactivated'} successfully`,
       data: updatedUser
     }, {
-      headers: {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Methods': 'POST, OPTIONS',
-        'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-      }
+      
     });
 
   } catch (error: unknown) {
@@ -141,13 +102,7 @@ export async function POST(
     return NextResponse.json(
       { success: false, error: 'Failed to toggle user status' },
       {
-        status: 500,
-        headers: {
-          'Access-Control-Allow-Origin': '*',
-          'Access-Control-Allow-Methods': 'POST, OPTIONS',
-          'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-        }
-      }
+        status: 500 }
     );
   }
 }

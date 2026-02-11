@@ -14,12 +14,7 @@ interface AuthTokenPayload extends jwt.JwtPayload {
 export async function OPTIONS() {
   return new Response(null, {
     status: 200,
-    headers: {
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, PATCH, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-    },
-  });
+     });
 }
 
 // Helper function to verify admin
@@ -61,13 +56,7 @@ export async function PUT(
       return NextResponse.json(
         { success: false, error: authResult.error },
         { 
-          status: authResult.status,
-          headers: {
-            'Access-Control-Allow-Origin': '*',
-            'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, PATCH, OPTIONS',
-            'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-          }
-        }
+          status: authResult.status }
       );
     }
 
@@ -81,13 +70,7 @@ export async function PUT(
       return NextResponse.json(
         { success: false, error: 'User not found' },
         { 
-          status: 404,
-          headers: {
-            'Access-Control-Allow-Origin': '*',
-            'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, PATCH, OPTIONS',
-            'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-          }
-        }
+          status: 404 }
       );
     }
 
@@ -108,11 +91,7 @@ export async function PUT(
       message: 'User updated successfully',
       data: updatedUser
     }, {
-      headers: {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, PATCH, OPTIONS',
-        'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-      }
+      
     });
 
   } catch (error: unknown) {
@@ -120,13 +99,7 @@ export async function PUT(
     return NextResponse.json(
       { success: false, error: 'Failed to update user' },
       { 
-        status: 500,
-        headers: {
-          'Access-Control-Allow-Origin': '*',
-          'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, PATCH, OPTIONS',
-          'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-        }
-      }
+        status: 500 }
     );
   }
 }
@@ -144,13 +117,7 @@ export async function PATCH(
       return NextResponse.json(
         { success: false, error: authResult.error },
         { 
-          status: authResult.status,
-          headers: {
-            'Access-Control-Allow-Origin': '*',
-            'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, PATCH, OPTIONS',
-            'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-          }
-        }
+          status: authResult.status }
       );
     }
 
@@ -164,13 +131,7 @@ export async function PATCH(
       return NextResponse.json(
         { success: false, error: 'User not found' },
         { 
-          status: 404,
-          headers: {
-            'Access-Control-Allow-Origin': '*',
-            'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, PATCH, OPTIONS',
-            'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-          }
-        }
+          status: 404 }
       );
     }
 
@@ -179,13 +140,7 @@ export async function PATCH(
       return NextResponse.json(
         { success: false, error: 'You cannot deactivate yourself' },
         { 
-          status: 400,
-          headers: {
-            'Access-Control-Allow-Origin': '*',
-            'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, PATCH, OPTIONS',
-            'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-          }
-        }
+          status: 400 }
       );
     }
 
@@ -201,11 +156,7 @@ export async function PATCH(
       message: `User ${user.isActive ? 'activated' : 'deactivated'} successfully`,
       data: updatedUser
     }, {
-      headers: {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, PATCH, OPTIONS',
-        'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-      }
+      
     });
 
   } catch (error: unknown) {
@@ -213,13 +164,7 @@ export async function PATCH(
     return NextResponse.json(
       { success: false, error: 'Failed to update user status' },
       { 
-        status: 500,
-        headers: {
-          'Access-Control-Allow-Origin': '*',
-          'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, PATCH, OPTIONS',
-          'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-        }
-      }
+        status: 500 }
     );
   }
 }
@@ -237,13 +182,7 @@ export async function DELETE(
       return NextResponse.json(
         { success: false, error: authResult.error },
         { 
-          status: authResult.status,
-          headers: {
-            'Access-Control-Allow-Origin': '*',
-            'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, PATCH, OPTIONS',
-            'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-          }
-        }
+          status: authResult.status }
       );
     }
 
@@ -255,13 +194,7 @@ export async function DELETE(
       return NextResponse.json(
         { success: false, error: 'User not found' },
         { 
-          status: 404,
-          headers: {
-            'Access-Control-Allow-Origin': '*',
-            'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, PATCH, OPTIONS',
-            'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-          }
-        }
+          status: 404 }
       );
     }
 
@@ -270,13 +203,7 @@ export async function DELETE(
       return NextResponse.json(
         { success: false, error: 'You cannot delete yourself' },
         { 
-          status: 400,
-          headers: {
-            'Access-Control-Allow-Origin': '*',
-            'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, PATCH, OPTIONS',
-            'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-          }
-        }
+          status: 400 }
       );
     }
 
@@ -285,13 +212,7 @@ export async function DELETE(
       return NextResponse.json(
         { success: false, error: 'Cannot delete admin users' },
         { 
-          status: 400,
-          headers: {
-            'Access-Control-Allow-Origin': '*',
-            'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, PATCH, OPTIONS',
-            'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-          }
-        }
+          status: 400 }
       );
     }
 
@@ -302,11 +223,7 @@ export async function DELETE(
       success: true,
       message: 'User deleted successfully'
     }, {
-      headers: {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, PATCH, OPTIONS',
-        'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-      }
+      
     });
 
   } catch (error: unknown) {
@@ -314,13 +231,7 @@ export async function DELETE(
     return NextResponse.json(
       { success: false, error: 'Failed to delete user' },
       { 
-        status: 500,
-        headers: {
-          'Access-Control-Allow-Origin': '*',
-          'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, PATCH, OPTIONS',
-          'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-        }
-      }
+        status: 500 }
     );
   }
 }

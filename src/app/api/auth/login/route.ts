@@ -114,11 +114,9 @@ export async function POST(request: NextRequest) {
       {
         success: true,
         message: 'Login successful',
-        data: userResponse,
-      },
+        data: userResponse },
       {
-        status: 200,
-      }
+        status: 200 }
     );
 
   } catch (error) {

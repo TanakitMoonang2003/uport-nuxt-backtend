@@ -10,17 +10,6 @@ interface AuthTokenPayload extends jwt.JwtPayload {
   username?: string;
 }
 
-// Handle CORS preflight requests
-export async function OPTIONS() {
-  return new Response(null, {
-    status: 200,
-    headers: {
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-    },
-  });
-}
 
 // GET /api/portfolio - Get all portfolio items
 export async function GET(request: NextRequest) {
@@ -67,24 +56,14 @@ export async function GET(request: NextRequest) {
       success: true,
       data: portfolios
     }, {
-      headers: {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-        'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-      }
+      
     });
   } catch (error) {
     console.error('Error fetching portfolios:', error);
     return NextResponse.json(
       { success: false, error: 'Failed to fetch portfolios' },
       {
-        status: 500,
-        headers: {
-          'Access-Control-Allow-Origin': '*',
-          'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-          'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-        }
-      }
+        status: 500 }
     );
   }
 }
@@ -111,13 +90,7 @@ export async function POST(request: NextRequest) {
           missingFields: missingFields
         },
         {
-          status: 400,
-          headers: {
-            'Access-Control-Allow-Origin': '*',
-            'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-            'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-          }
-        }
+          status: 400 }
       );
     }
 
@@ -159,13 +132,7 @@ export async function POST(request: NextRequest) {
       success: true,
       data: portfolio
     }, {
-      status: 201,
-      headers: {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-        'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-      }
-    });
+      status: 201 });
   } catch (error: unknown) {
     console.error('❌ Error creating portfolio:');
     if (error instanceof Error) {
@@ -199,13 +166,7 @@ export async function POST(request: NextRequest) {
           validationErrors: validationErrors
         },
         {
-          status: 400,
-          headers: {
-            'Access-Control-Allow-Origin': '*',
-            'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-            'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-          }
-        }
+          status: 400 }
       );
     }
 
@@ -224,34 +185,22 @@ export async function POST(request: NextRequest) {
           error: 'Portfolio with this ID already exists'
         },
         {
-          status: 409,
-          headers: {
-            'Access-Control-Allow-Origin': '*',
-            'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-            'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-          }
-        }
+          status: 409 }
       );
     }
 
     // Generic error
     return NextResponse.json(
-        {
-          success: false,
-          error: 'Failed to create portfolio',
-          details:
-            process.env.NODE_ENV === 'development' && error instanceof Error
-              ? error.message
-              : undefined
-        },
       {
-        status: 500,
-        headers: {
-          'Access-Control-Allow-Origin': '*',
-          'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-          'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-        }
-      }
+        success: false,
+        error: 'Failed to create portfolio',
+        details:
+          process.env.NODE_ENV === 'development' && error instanceof Error
+            ? error.message
+            : undefined
+      },
+      {
+        status: 500 }
     );
   }
 }

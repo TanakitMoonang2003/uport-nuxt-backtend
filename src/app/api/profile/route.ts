@@ -9,17 +9,6 @@ interface AuthTokenPayload extends jwt.JwtPayload {
     role: 'admin' | 'user' | 'company' | 'teacher';
     username?: string;
 }
-const allowedOrigin =
-    process.env.NODE_ENV === 'production'
-        ? 'https://uport-nuxt-frontend.vercel.app'
-        : 'http://localhost:3000';
-// CORS headers
-const corsHeaders = {
-      'Access-Control-Allow-Origin': 'https://uport-nuxt-frontend.vercel.app',
-    'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-    'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-    'Access-Control-Allow-Credentials': 'true',
-};
 
 // GET /api/profile - Get current user profile
 export async function GET(request: NextRequest) {
@@ -31,7 +20,7 @@ export async function GET(request: NextRequest) {
         if (!authHeader) {
             return NextResponse.json(
                 { success: false, error: 'Unauthorized' },
-                { status: 401, headers: corsHeaders }
+                { status: 401 }
             );
         }
 
@@ -48,7 +37,7 @@ export async function GET(request: NextRequest) {
             if (!user) {
                 return NextResponse.json(
                     { success: false, error: 'User not found' },
-                    { status: 404, headers: corsHeaders }
+                    { status: 404 }
                 );
             }
 
@@ -56,20 +45,20 @@ export async function GET(request: NextRequest) {
             return NextResponse.json({
                 success: true,
                 data: user
-            }, { headers: corsHeaders });
+            }, {});
 
         } catch (jwtError: unknown) {
             console.error('JWT verification failed:', jwtError);
             return NextResponse.json(
                 { success: false, error: 'Invalid or expired token' },
-                { status: 401, headers: corsHeaders }
+                { status: 401 }
             );
         }
     } catch (error) {
         console.error('Error fetching profile:', error);
         return NextResponse.json(
             { success: false, error: 'Failed to fetch profile' },
-            { status: 500, headers: corsHeaders }
+            { status: 500 }
         );
     }
 }
@@ -84,7 +73,7 @@ export async function PUT(request: NextRequest) {
         if (!authHeader) {
             return NextResponse.json(
                 { success: false, error: 'Unauthorized' },
-                { status: 401, headers: corsHeaders }
+                { status: 401 }
             );
         }
 
@@ -103,7 +92,7 @@ export async function PUT(request: NextRequest) {
                 if (!body.profilePicture.startsWith('data:image/')) {
                     return NextResponse.json(
                         { success: false, error: 'Invalid profile picture format' },
-                        { status: 400, headers: corsHeaders }
+                        { status: 400 }
                     );
                 }
 
@@ -111,7 +100,7 @@ export async function PUT(request: NextRequest) {
                 if (body.profilePicture.length > 3000000) {
                     return NextResponse.json(
                         { success: false, error: 'Profile picture too large (max 2MB)' },
-                        { status: 400, headers: corsHeaders }
+                        { status: 400 }
                     );
                 }
             }
@@ -152,7 +141,7 @@ export async function PUT(request: NextRequest) {
             if (!user) {
                 return NextResponse.json(
                     { success: false, error: 'User not found' },
-                    { status: 404, headers: corsHeaders }
+                    { status: 404 }
                 );
             }
 
@@ -160,25 +149,21 @@ export async function PUT(request: NextRequest) {
             return NextResponse.json({
                 success: true,
                 data: user
-            }, { headers: corsHeaders });
+            }, {});
 
         } catch (jwtError: unknown) {
             console.error('JWT verification failed:', jwtError);
             return NextResponse.json(
                 { success: false, error: 'Invalid or expired token' },
-                { status: 401, headers: corsHeaders }
+                { status: 401 }
             );
         }
     } catch (error) {
         console.error('Error updating profile:', error);
         return NextResponse.json(
             { success: false, error: 'Failed to update profile' },
-            { status: 500, headers: corsHeaders }
+            { status: 500 }
         );
     }
 }
 
-// OPTIONS for CORS
-export async function OPTIONS() {
-    return NextResponse.json({}, { headers: corsHeaders });
-}
