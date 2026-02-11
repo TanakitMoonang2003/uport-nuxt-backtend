@@ -9,12 +9,16 @@ interface AuthTokenPayload extends jwt.JwtPayload {
     role: 'admin' | 'user' | 'company' | 'teacher';
     username?: string;
 }
-
+const allowedOrigin =
+    process.env.NODE_ENV === 'production'
+        ? 'https://uport-nuxt-frontend.vercel.app'
+        : 'http://localhost:3000';
 // CORS headers
 const corsHeaders = {
-    'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Origin': 'https://uport-nuxt-frontend.vercel.app',
     'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
     'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+    'Access-Control-Allow-Credentials': 'true',
 };
 
 // GET /api/profile - Get current user profile
