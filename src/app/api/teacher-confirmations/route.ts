@@ -24,10 +24,8 @@ export async function GET(request: NextRequest) {
     
     // Get authorization header
     const authHeader = request.headers.get('authorization');
-    console.log('🔍 Teacher Confirmations - Auth Header:', authHeader);
     
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      console.log('❌ Teacher Confirmations - No valid auth header');
       return NextResponse.json(
         { success: false, error: 'Authorization token required' },
         { status: 401 }
@@ -35,9 +33,7 @@ export async function GET(request: NextRequest) {
     }
 
     const token = authHeader.substring(7);
-    console.log('🔍 Teacher Confirmations - Extracted token:', token);
-    console.log('🔍 Teacher Confirmations - Token length:', token.length);
-    console.log('🔍 Teacher Confirmations - Token parts:', token.split('.').length);
+
     
     let decoded: AuthTokenPayload;
     try {
@@ -45,7 +41,7 @@ export async function GET(request: NextRequest) {
         token,
         process.env.JWT_SECRET || 'fallback-secret'
       ) as AuthTokenPayload;
-      console.log('✅ Teacher Confirmations - Token verified successfully');
+
     } catch (jwtError) {
       console.error('❌ Teacher Confirmations - JWT verification failed:', jwtError);
       return NextResponse.json(

@@ -48,7 +48,6 @@ walk(apiBaseDir, (filePath) => {
     content = content.replace(optionsRegex, '');
 
     if (content !== originalContent) {
-        console.log(`Cleaned up ${filePath}`);
         fs.writeFileSync(filePath, content, 'utf8');
     }
 });

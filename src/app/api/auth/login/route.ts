@@ -31,11 +31,9 @@ export async function POST(request: NextRequest) {
     }
 
     // Find user by email (include password field)
-    console.log(`Login attempt for email: "${email}" (length: ${email.length})`);
     const user = await User.findOne({ email }).select('+password');
 
     if (!user) {
-      console.log(`Login attempt failed: User not found for email ${email}`);
       return NextResponse.json(
         { success: false, error: 'Invalid email or password (ERR_USER_NOT_FOUND)' },
         { status: 401 }
@@ -44,7 +42,6 @@ export async function POST(request: NextRequest) {
 
     // Check if user is active
     if (!user.isActive) {
-      console.log(`Login attempt failed: User ${email} is inactive`);
       return NextResponse.json(
         { success: false, error: 'Account is disabled. (ERR_USER_INACTIVE)' },
         { status: 401 }
@@ -76,11 +73,9 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    console.log(`Verifying password for ${email} (password length: ${password.length})`);
     const isPasswordValid = await user.comparePassword(password);
 
     if (!isPasswordValid) {
-      console.log(`Login attempt failed: Incorrect password for user ${email}`);
       return NextResponse.json(
         { success: false, error: 'Invalid email or password (ERR_PWD_INVALID)' },
         { status: 401 }

@@ -17,10 +17,6 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { companyId, action } = body;
     
-    console.log('=== CONFIRMING COMPANY ===');
-    console.log('Company ID:', companyId);
-    console.log('Action:', action);
-    
     if (!companyId || !action) {
       return NextResponse.json(
         { success: false, error: 'Company ID and action are required' },
@@ -61,14 +57,6 @@ export async function POST(request: NextRequest) {
     }
     
     await company.save();
-    
-    console.log('Company updated successfully:', {
-      id: company._id,
-      email: company.email,
-      isCompanyApproved: company.isCompanyApproved,
-      isActive: company.isActive
-    });
-    
     return NextResponse.json({
       success: true,
       message: `Company ${action === 'approve' ? 'approved' : 'rejected'} successfully`,

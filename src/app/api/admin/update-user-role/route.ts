@@ -35,12 +35,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    console.log('Found user:', {
-      id: user._id,
-      email: user.email,
-      username: user.username,
-      currentRole: user.role
-    });
 
     // Update user role
     const updatedUser = await User.findByIdAndUpdate(
@@ -49,12 +43,7 @@ export async function POST(request: NextRequest) {
       { new: true }
     );
 
-    console.log('User updated:', {
-      id: updatedUser._id,
-      email: updatedUser.email,
-      username: updatedUser.username,
-      newRole: updatedUser.role
-    });
+
 
     return NextResponse.json({
       success: true,

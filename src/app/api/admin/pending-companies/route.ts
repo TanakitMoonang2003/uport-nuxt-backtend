@@ -14,16 +14,12 @@ export async function GET() {
   try {
     await connectDB();
     
-    console.log('=== FETCHING PENDING COMPANIES ===');
-    
     // Find all companies that are not approved
     const pendingCompanies = await User.find({
       role: 'company',
       isCompanyApproved: { $ne: true }
     }).select('-password');
-    
-    console.log('Found pending companies:', pendingCompanies.length);
-    console.log('Pending companies:', pendingCompanies);
+
     
     return NextResponse.json({
       success: true,

@@ -34,7 +34,7 @@ const PortfolioSchema = new Schema<IPortfolio>({
   category: {
     type: String,
     required: true,
-    enum: ['web', 'mobile', 'uiux', 'fullstack', 'game']
+    enum: ['web', 'mobile', 'uiux', 'fullstack', 'game', 'design', 'data', 'ai', 'other']
   },
   title: {
     type: String,

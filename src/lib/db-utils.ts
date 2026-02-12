@@ -9,7 +9,7 @@ import User from '@/models/User';
 export async function testConnection() {
   try {
     await connectDB();
-    console.log('✅ Database connection successful');
+
     return true;
   } catch (error) {
     console.error('❌ Database connection failed:', error);
@@ -22,7 +22,7 @@ export async function clearDatabase() {
     await connectDB();
     await Portfolio.deleteMany({});
     await User.deleteMany({});
-    console.log('🗑️ Database cleared');
+
     return true;
   } catch (error) {
     console.error('❌ Failed to clear database:', error);
@@ -37,7 +37,6 @@ export async function seedDatabase() {
     // Check if data already exists
     const existingPortfolios = await Portfolio.countDocuments();
     if (existingPortfolios > 0) {
-      console.log('📊 Database already has data, skipping seed');
       return true;
     }
 
@@ -89,7 +88,6 @@ export async function seedDatabase() {
 
     // Insert sample portfolios
     await Portfolio.insertMany(samplePortfolios);
-    console.log('🌱 Database seeded with sample data');
     return true;
   } catch (error) {
     console.error('❌ Failed to seed database:', error);
@@ -104,9 +102,6 @@ export async function getDatabaseStats() {
     const portfolioCount = await Portfolio.countDocuments();
     const userCount = await User.countDocuments();
     
-    console.log('📊 Database Statistics:');
-    console.log(`   Portfolios: ${portfolioCount}`);
-    console.log(`   Users: ${userCount}`);
     
     return {
       portfolios: portfolioCount,

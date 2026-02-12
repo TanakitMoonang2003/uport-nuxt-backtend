@@ -17,14 +17,11 @@ const generateOTP = () => {
 
 export async function POST(request: NextRequest) {
   try {
-    console.log('OTP endpoint called');
     await connectDB();
     
     const { email } = await request.json();
-    console.log('Email received:', email);
     
     if (!email) {
-      console.log('No email provided');
       return NextResponse.json(
         { success: false, error: 'Email is required' },
         { status: 400 }
@@ -60,13 +57,9 @@ export async function POST(request: NextRequest) {
 
     // Send OTP via email using Brevo
     try {
-      console.log('📧 Attempting to send OTP email via Brevo...');
-      console.log('   BREVO_API_KEY exists:', !!process.env.BREVO_API_KEY);
-      console.log('   BREVO_API_KEY length:', process.env.BREVO_API_KEY?.length || 0);
-      console.log('   BREVO_FROM_EMAIL:', process.env.BREVO_FROM_EMAIL || 'not set');
+
       
       await sendOTPEmail({ email, otp });
-      console.log(`✅ OTP email sent successfully to ${email}`);
     } catch (emailError: unknown) {
       console.error('❌ Failed to send OTP email:', emailError);
 
@@ -84,10 +77,6 @@ export async function POST(request: NextRequest) {
       );
       
       // Log OTP to console as fallback for debugging
-      console.log('=== OTP FALLBACK (Email failed) ===');
-      console.log(`Email: ${email}`);
-      console.log(`OTP Code: ${otp}`);
-      console.log('===================================');
       
       // Return error response instead of success
       // This will help frontend know that email sending failed

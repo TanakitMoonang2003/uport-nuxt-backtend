@@ -14,16 +14,11 @@ export async function GET() {
   try {
     await connectDB();
     
-    console.log('=== FETCHING PENDING TEACHERS ===');
-    
     // Find all teachers that are not confirmed
     const pendingTeachers = await User.find({
       role: 'teacher',
       isTeacherConfirmed: { $ne: true }
     }).select('-password');
-    
-    console.log('Found pending teachers:', pendingTeachers.length);
-    console.log('Pending teachers:', pendingTeachers);
     
     return NextResponse.json({
       success: true,

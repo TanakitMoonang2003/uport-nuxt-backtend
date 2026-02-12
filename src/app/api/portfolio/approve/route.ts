@@ -93,8 +93,6 @@ export async function POST(request: NextRequest) {
     
     await portfolio.save();
     
-    console.log(`✅ Portfolio ${portfolioId} ${action}d by ${decoded.email || decoded.username}`);
-    
     return NextResponse.json({
       success: true,
       message: `Portfolio ${action}d successfully`,

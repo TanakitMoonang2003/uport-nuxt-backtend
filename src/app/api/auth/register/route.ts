@@ -26,17 +26,10 @@ export async function POST(request: NextRequest) {
       ...additionalData 
     } = body;
 
-    // Debug logging
-    console.log('Registration request body:', body);
-    console.log('Email:', email);
-    console.log('Username:', username);
-    console.log('Password length:', password?.length);
-    console.log('ConfirmPassword provided:', !!confirmPassword);
-    console.log('UserType:', userType);
+ 
 
     // Validation
     if (!email || !username || !password) {
-      console.log('Missing required fields - email:', !!email, 'username:', !!username, 'password:', !!password);
       return NextResponse.json(
         { success: false, error: 'Email, username, and password are required' },
         { status: 400 }
@@ -45,7 +38,6 @@ export async function POST(request: NextRequest) {
 
     // Only check password match if confirmPassword is provided
     if (confirmPassword && password !== confirmPassword) {
-      console.log('Password mismatch - password:', password, 'confirmPassword:', confirmPassword);
       return NextResponse.json(
         { success: false, error: 'Passwords do not match' },
         { status: 400 }
@@ -53,7 +45,6 @@ export async function POST(request: NextRequest) {
     }
 
     if (password.length < 6) {
-      console.log('Password too short:', password.length);
       return NextResponse.json(
         { success: false, error: 'Password must be at least 6 characters' },
         { status: 400 }
@@ -108,12 +99,10 @@ export async function POST(request: NextRequest) {
     };
 
     // Create new user
-    console.log('Creating user with data:', userData);
     const user = new User(userData);
     
     try {
       await user.save();
-      console.log('User created successfully:', user._id);
     } catch (saveError) {
       console.error('User creation error:', saveError);
       return NextResponse.json(

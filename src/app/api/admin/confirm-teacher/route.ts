@@ -17,10 +17,6 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { teacherId, action } = body;
     
-    console.log('=== CONFIRMING TEACHER ===');
-    console.log('Teacher ID:', teacherId);
-    console.log('Action:', action);
-    
     if (!teacherId || !action) {
       return NextResponse.json(
         { success: false, error: 'Teacher ID and action are required' },
@@ -61,14 +57,6 @@ export async function POST(request: NextRequest) {
     }
     
     await teacher.save();
-    
-    console.log('Teacher updated successfully:', {
-      id: teacher._id,
-      email: teacher.email,
-      isTeacherConfirmed: teacher.isTeacherConfirmed,
-      isActive: teacher.isActive
-    });
-    
     return NextResponse.json({
       success: true,
       message: `Teacher ${action === 'accept' ? 'confirmed' : 'rejected'} successfully`,
