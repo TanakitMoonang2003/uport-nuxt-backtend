@@ -23,6 +23,7 @@ export async function POST(request: NextRequest) {
       confirmPassword, 
       otpVerified = false,
       userType, // 'student' or 'teacher'
+      role: _roleIgnored, // ignore role from body, always derive from userType
       ...additionalData 
     } = body;
 
@@ -84,12 +85,13 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Create user data
+    // Create user data - always derive role from userType, never trust role from body
+    const resolvedRole = userType === 'teacher' ? 'teacher' : userType === 'company' ? 'company' : 'user';
     const userData = {
       email,
       username,
       password,
-      role: userType === 'teacher' ? 'teacher' : userType === 'company' ? 'company' : 'user',
+      role: resolvedRole,
       isActive: true,
       // For teachers, set confirmation status to false initially
       ...(userType === 'teacher' && { isTeacherConfirmed: false }),
