@@ -84,12 +84,12 @@ export async function POST(request: NextRequest) {
         { 
           success: false, 
           error: 'Failed to send OTP email. Please check server logs for details.',
-          errorDetails: process.env.NODE_ENV === 'development'
-            ? {
-                message: emailErr.message,
-                status: emailErr.status || emailErr.response?.status
-              }
-            : undefined
+          errorDetails: {
+            message: String(emailErr.message || 'Unknown error'),
+            status: emailErr.status || emailErr.response?.status || null,
+            hasBrevoKey: !!process.env.BREVO_API_KEY,
+            keyPrefix: process.env.BREVO_API_KEY?.substring(0, 10) || 'NOT_SET'
+          }
         },
         { status: 500 }
       );
