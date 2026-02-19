@@ -84,16 +84,6 @@ export async function DELETE(
 
     await user.save();
 
-    // Optionally delete the file from filesystem
-    try {
-      const filePath = path.join(process.cwd(), 'public', removedFile.url);
-      const fs = await import('fs/promises');
-      await fs.unlink(filePath);
-    } catch (error) {
-      // File might not exist, ignore error
-      console.log('File not found in filesystem:', removedFile.url);
-    }
-
     return NextResponse.json({
       success: true,
       message: 'File removed successfully'

@@ -2,8 +2,6 @@ import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import User from '@/models/User';
 import jwt from 'jsonwebtoken';
-import { writeFile, mkdir } from 'fs/promises';
-import path from 'path';
 
 interface AuthTokenPayload extends jwt.JwtPayload {
   userId: string;
@@ -73,27 +71,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Create uploads directory if it doesn't exist
-    const uploadsDir = path.join(process.cwd(), 'public', 'uploads', 'portfolio');
-    try {
-      await mkdir(uploadsDir, { recursive: true });
-    } catch (error) {
-      // Directory might already exist, ignore error
-    }
-
-    // Generate unique filename
-    const timestamp = Date.now();
-    const fileExtension = file.name.split('.').pop();
-    const uniqueFilename = `${decoded.userId}_${timestamp}.${fileExtension}`;
-    const filePath = path.join(uploadsDir, uniqueFilename);
-
-    // Save file to filesystem
+    // Convert file to base64 for storage in MongoDB (Vercel filesystem is read-only)
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
-    await writeFile(filePath, buffer);
-
-    // Create file URL
-    const fileUrl = `/uploads/portfolio/${uniqueFilename}`;
+    const base64Data = `data:${file.type};base64,${buffer.toString('base64')}`;
 
     // Update user's portfolio files array
     const user = await User.findById(decoded.userId);
@@ -109,7 +90,7 @@ export async function POST(request: NextRequest) {
       name: file.name,
       type: fileType === 'application/pdf' ? 'pdf' : 'image',
       size: file.size,
-      url: fileUrl,
+      url: base64Data,
       uploadedAt: new Date()
     };
 
@@ -123,7 +104,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       success: true,
       data: {
-        url: fileUrl,
+        url: base64Data,
         fileData
       }
     });
@@ -212,16 +193,6 @@ export async function DELETE(
     user.portfolioFiles.splice(fileIndex, 1);
 
     await user.save();
-
-    // Optionally delete the file from filesystem
-    try {
-      const filePath = path.join(process.cwd(), 'public', removedFile.url);
-      const fs = await import('fs/promises');
-      await fs.unlink(filePath);
-    } catch (error) {
-      // File might not exist, ignore error
-      console.log('File not found in filesystem:', removedFile.url);
-    }
 
     return NextResponse.json({
       success: true,
