@@ -50,6 +50,14 @@ export interface IUser extends Document {
   // Additional profile fields
   bio?: string;
   skills?: string[];
+  portfolioFiles?: Array<{
+    id: string;
+    name: string;
+    type: 'image' | 'pdf';
+    size: number;
+    url: string;
+    uploadedAt: Date;
+  }>;
 
   createdAt: Date;
   updatedAt: Date;
@@ -217,7 +225,15 @@ const UserSchema = new Schema<IUser>({
   skills: {
     type: [String],
     default: []
-  }
+  },
+  portfolioFiles: [{
+    id: { type: String, required: true },
+    name: { type: String, required: true },
+    type: { type: String, enum: ['image', 'pdf'], required: true },
+    size: { type: Number, required: true },
+    url: { type: String, required: true },
+    uploadedAt: { type: Date, default: Date.now }
+  }]
 }, {
   timestamps: true
 });

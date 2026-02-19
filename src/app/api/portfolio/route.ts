@@ -11,14 +11,9 @@ interface AuthTokenPayload extends jwt.JwtPayload {
 }
 
 
-// Set body size limit for large image uploads (base64)
-export const config = {
-  api: {
-    bodyParser: {
-      sizeLimit: '10mb',
-    },
-  },
-};
+// App Router route segment config - increase body size limit for base64 image uploads
+export const maxDuration = 60;
+export const dynamic = 'force-dynamic';
 
 // GET /api/portfolio - Get all portfolio items
 export async function GET(request: NextRequest) {
@@ -46,11 +41,18 @@ export async function GET(request: NextRequest) {
       isAdminOrTeacher = false;
     }
 
+    const userEmail = searchParams.get('user');
+
     const query: Record<string, unknown> = {};
 
     // Filter by category
     if (category && category !== 'all') {
       query.category = category;
+    }
+
+    // Filter by submittedBy (user email) for public profile pages
+    if (userEmail) {
+      query.submittedBy = decodeURIComponent(userEmail);
     }
 
     // For public users, only show approved portfolios
@@ -133,6 +135,7 @@ export async function POST(request: NextRequest) {
       id: newId,
       technologies,
       features,
+      images: Array.isArray(body.images) ? body.images : [],
       status: 'pending', // Always set to pending when created
       submittedBy: body.submittedBy || '' // User ID or email who submitted
     });

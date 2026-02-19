@@ -109,6 +109,10 @@ export async function PUT(request: NextRequest) {
     }
 
     const body = await request.json();
+    
+    console.log('Profile update - User ID:', decoded.userId);
+    console.log('Profile update - body keys:', Object.keys(body));
+    console.log('Profile update - avatarBase64 present:', body.avatarBase64 !== undefined, 'length:', body.avatarBase64?.length ?? 0);
 
     // Check if User model exists
     if (!User) {
@@ -116,10 +120,41 @@ export async function PUT(request: NextRequest) {
       throw new Error('User model is not defined');
     }
 
+    // Validate that user exists before updating
+    const existingUser = await User.findById(decoded.userId);
+    if (!existingUser) {
+      console.error('User not found for ID:', decoded.userId);
+      return NextResponse.json(
+        { success: false, error: 'User not found' },
+        { status: 404 }
+      );
+    }
+
+    // Filter out any invalid fields and only update allowed fields
+    const allowedFields = [
+      'username', 'firstName', 'lastName', 'phone', 'bio', 'skills', 
+      'portfolioFiles', 'yearOfStudy', 'department', 'avatarUrl', 'uploadedAt'
+    ];
+    
+    const updateData: any = {};
+    for (const field of allowedFields) {
+      if (body[field] !== undefined) {
+        updateData[field] = body[field];
+      }
+    }
+
+    // Map avatarBase64 → avatarUrl (frontend may send either field name)
+    if (body.avatarBase64 !== undefined) {
+      updateData.avatarUrl = body.avatarBase64;
+    }
+
+    console.log('updateData keys:', Object.keys(updateData));
+    console.log('updateData.avatarUrl present:', !!updateData.avatarUrl, 'length:', updateData.avatarUrl?.length ?? 0);
+
     // Update user profile
     const user = await User.findByIdAndUpdate(
       decoded.userId,
-      body,
+      updateData,
       { new: true, runValidators: true }
     ).select('-password');
 
@@ -130,17 +165,51 @@ export async function PUT(request: NextRequest) {
       );
     }
 
+    console.log('Saved user.avatarUrl length:', user.avatarUrl?.length ?? 0);
+
     return NextResponse.json({
       success: true,
       data: user
     });
   } catch (error: any) {
     console.error('Error updating user profile:', error);
+    
+    // Handle specific validation errors
+    if (error.name === 'ValidationError') {
+      const validationErrors = Object.values(error.errors).map((err: any) => ({
+        field: err.path,
+        message: err.message
+      }));
+      
+      return NextResponse.json(
+        {
+          success: false,
+          error: 'Validation failed',
+          validationErrors,
+          message: 'Please check your input and try again'
+        },
+        { status: 400 }
+      );
+    }
+    
+    // Handle duplicate key errors
+    if (error.code === 11000) {
+      const field = Object.keys(error.keyPattern)[0];
+      return NextResponse.json(
+        {
+          success: false,
+          error: 'Duplicate entry',
+          message: `${field} already exists`
+        },
+        { status: 409 }
+      );
+    }
+
     return NextResponse.json(
       {
         success: false,
         error: 'Failed to update user profile',
-        message: error.message
+        message: error.message || 'Unknown error occurred'
       },
       { status: 500 }
     );

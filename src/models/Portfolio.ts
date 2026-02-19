@@ -15,6 +15,7 @@ export interface IPortfolio extends Document {
   client: string;
   // Upload form fields
   uploadedFile?: string;
+  images?: string[];  // Multiple images (base64 or URL)
   repoUrl?: string;
   details?: string;
   status: 'pending' | 'approved' | 'rejected';
@@ -84,6 +85,10 @@ const PortfolioSchema = new Schema<IPortfolio>({
   uploadedFile: {
     type: String,
     default: ''
+  },
+  images: {
+    type: [String],
+    default: []
   },
   repoUrl: {
     type: String,
