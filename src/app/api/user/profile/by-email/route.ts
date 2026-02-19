@@ -2,15 +2,13 @@ import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import User from '@/models/User';
 
-// GET /api/user/profile/[email] - Get public user profile by email
-export async function GET(
-  request: NextRequest,
-  { params }: { params: { email: string } }
-) {
+// GET /api/user/profile/by-email?email=user@domain.com
+// Uses query param instead of path segment to avoid Vercel dot-in-path 404 issues
+export async function GET(request: NextRequest) {
   try {
     await connectDB();
 
-    const { email } = params;
+    const email = request.nextUrl.searchParams.get('email');
 
     if (!email) {
       return NextResponse.json(
@@ -19,7 +17,6 @@ export async function GET(
       );
     }
 
-    // Find user by email
     const user = await User.findOne({ email: decodeURIComponent(email) }).select('-password');
 
     if (!user) {
@@ -29,7 +26,6 @@ export async function GET(
       );
     }
 
-    // Return only public-safe information
     const publicProfile = {
       _id: user._id,
       email: user.email,
