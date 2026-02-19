@@ -14,7 +14,7 @@ interface AuthTokenPayload extends jwt.JwtPayload {
 // DELETE /api/user/profile/portfolio/[fileId] - Remove portfolio file
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { fileId: string } }
+  { params }: { params: Promise<{ fileId: string }> }
 ) {
   try {
     await connectDB();
@@ -45,7 +45,7 @@ export async function DELETE(
       );
     }
 
-    const { fileId } = params;
+    const { fileId } = await params;
 
     if (!fileId) {
       return NextResponse.json(

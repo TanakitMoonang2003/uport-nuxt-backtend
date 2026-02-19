@@ -142,8 +142,7 @@ export async function POST(request: NextRequest) {
 
 // DELETE /api/user/profile/portfolio/[fileId] - Remove portfolio file
 export async function DELETE(
-  request: NextRequest,
-  { params }: { params: { fileId: string } }
+  request: NextRequest
 ) {
   try {
     await connectDB();
