@@ -103,12 +103,22 @@ export async function POST(request: NextRequest) {
     
     try {
       await user.save();
-    } catch (saveError) {
+    } catch (saveError: unknown) {
       console.error('User creation error:', saveError);
+      const err = saveError as { code?: number; message?: string; keyValue?: Record<string, unknown> };
+      
+      // Duplicate key error
+      if (err.code === 11000) {
+        const field = Object.keys(err.keyValue || {})[0] || 'field';
+        return NextResponse.json(
+          { success: false, error: `${field} already exists` },
+          { status: 409 }
+        );
+      }
+      
       return NextResponse.json(
-        { success: false, error: 'Failed to create user account' },
-        { 
-          status: 500 }
+        { success: false, error: 'Failed to create user account', detail: err.message },
+        { status: 500 }
       );
     }
 
